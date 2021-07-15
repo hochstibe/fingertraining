@@ -3,7 +3,7 @@
 # Folder: speck_weg File: tables.py
 #
 
-from sqlalchemy import MetaData, Table, Column, Integer, String, ForeignKey
+from sqlalchemy import MetaData, Table, Column, Integer, String, ForeignKey, UniqueConstraint
 
 metadata = MetaData(naming_convention={
     "ix": "ix_%(column_0_N_label)s",
@@ -17,7 +17,10 @@ tpr_table = Table(
     'training_program', metadata,
     Column('tpr_id', Integer, primary_key=True, autoincrement='auto'),
     Column('tpr_name', String(63), nullable=False),
-    Column('tpr_description', String(1023), nullable=True)
+    Column('tpr_description', String(1023), nullable=True),
+
+    # Constraints
+    UniqueConstraint('tpr_name')
 )
 
 tpl_table = Table(

@@ -17,7 +17,7 @@ class TrainingProgram(Base):
     training_plans = relationship('TrainingPlan', back_populates='training_program')
 
     def __repr__(self):
-        return f'TrainingProgram(tpr_id={self.tpr_id!r}, tpr_name={self.tpr_name!r}'
+        return f'TrainingProgram(tpr_id={self.tpr_id!r}, tpr_name={self.tpr_name!r})'
 
 
 class TrainingPlan(Base):
@@ -28,7 +28,7 @@ class TrainingPlan(Base):
     training_program = relationship('TrainingProgram', back_populates='training_plans')
 
     def __repr__(self):
-        return f'TrainingPlan(tpl_id={self.tpl_id!r}, tpl_name={self.tpl_name!r}'
+        return f'TrainingPlan(tpl_id={self.tpl_id!r}, tpl_name={self.tpl_name!r})'
 
 
 class TrainingExcercise(Base):
@@ -38,4 +38,4 @@ class TrainingExcercise(Base):
     # orm definitions
 
     def __repr__(self):
-        return f'TrainingExercise(tex_id={self.tex_id!r}, tex_name={self.tex_name!r}'
+        return f'TrainingExercise(tex_id={self.tex_id!r}, tex_name={self.tex_name!r})'

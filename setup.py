@@ -18,7 +18,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'psycopg2', 'sqlalchemy'],
+        'psycopg2', 'sqlalchemy', 'pyqt5'],
     python_requires='>=3.9',
     url='https://github.com/hochstibe/fingertraining',
     classifiers=[
