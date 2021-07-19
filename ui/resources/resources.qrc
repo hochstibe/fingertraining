@@ -1,0 +1,7 @@
+<RCC>
+  <qresource prefix="icons">
+    <file>info-solid.svg</file>
+    <file>minus-solid.svg</file>
+    <file>plus-solid.svg</file>
+  </qresource>
+</RCC>

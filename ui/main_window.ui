@@ -14,32 +14,85 @@
    <string>Speck Weg!</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QWidget" name="horizontalLayoutWidget">
+   <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
-      <x>0</x>
+      <x>20</x>
       <y>0</y>
-      <width>461</width>
-      <height>461</height>
+      <width>258</width>
+      <height>226</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout">
+      <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
         <widget class="QLabel" name="label">
          <property name="text">
-          <string>Programm</string>
+          <string>Program</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QListWidget" name="list_widget_program"/>
+        <widget class="QPushButton" name="pushButton_add_program">
+         <property name="toolTip">
+          <string>New program</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="resources/resources.qrc">
+           <normaloff>:/icons/plus-solid.svg</normaloff>:/icons/plus-solid.svg</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_remove_program">
+         <property name="toolTip">
+          <string>Remove program</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="resources/resources.qrc">
+           <normaloff>:/icons/minus-solid.svg</normaloff>:/icons/minus-solid.svg</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </item>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
+      <widget class="QListWidget" name="listWidget_program"/>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>0</y>
+      <width>258</width>
+      <height>226</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
         <widget class="QLabel" name="label_2">
          <property name="text">
@@ -48,9 +101,50 @@
         </widget>
        </item>
        <item>
-        <widget class="QListWidget" name="list_widget_plan"/>
+        <widget class="QPushButton" name="pushButton_add_plan">
+         <property name="toolTip">
+          <string>New plan</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="resources/resources.qrc">
+           <normaloff>:/icons/plus-solid.svg</normaloff>:/icons/plus-solid.svg</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton">
+         <property name="toolTip">
+          <string>Remove plan</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="resources/resources.qrc">
+           <normaloff>:/icons/minus-solid.svg</normaloff>:/icons/minus-solid.svg</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
+     </item>
+     <item>
+      <widget class="QListWidget" name="listWidget_plan"/>
      </item>
     </layout>
    </widget>
@@ -100,8 +194,8 @@
   <widget class="QStatusBar" name="statusBar"/>
   <action name="action_new_exercise">
    <property name="icon">
-    <iconset>
-     <normaloff>resources/icons/plus-solid.svg</normaloff>resources/icons/plus-solid.svg</iconset>
+    <iconset resource="resources/resources.qrc">
+     <normaloff>:/icons/plus-solid.svg</normaloff>:/icons/plus-solid.svg</iconset>
    </property>
    <property name="text">
     <string>New Exercise</string>
@@ -111,11 +205,17 @@
    </property>
   </action>
   <action name="action_about">
+   <property name="icon">
+    <iconset resource="resources/resources.qrc">
+     <normaloff>:/icons/info-solid.svg</normaloff>:/icons/info-solid.svg</iconset>
+   </property>
    <property name="text">
     <string>&amp;About</string>
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
