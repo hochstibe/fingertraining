@@ -19,7 +19,7 @@
      <rect>
       <x>20</x>
       <y>0</y>
-      <width>258</width>
+      <width>221</width>
       <height>226</height>
      </rect>
     </property>
@@ -84,9 +84,9 @@
    <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>240</x>
       <y>0</y>
-      <width>258</width>
+      <width>221</width>
       <height>226</height>
      </rect>
     </property>
@@ -115,7 +115,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="pushButton_remove_plan">
          <property name="toolTip">
           <string>Remove plan</string>
          </property>
@@ -145,6 +145,67 @@
      </item>
      <item>
       <widget class="QListWidget" name="listWidget_plan"/>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>470</x>
+      <y>0</y>
+      <width>211</width>
+      <height>226</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_3">
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Exercise</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_add_exercise">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="resources/resources.qrc">
+           <normaloff>:/icons/plus-solid.svg</normaloff>:/icons/plus-solid.svg</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_remove_exercise">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="resources/resources.qrc">
+           <normaloff>:/icons/minus-solid.svg</normaloff>:/icons/minus-solid.svg</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QListView" name="listView"/>
      </item>
     </layout>
    </widget>

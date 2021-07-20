@@ -60,7 +60,7 @@ class Ui_dialog_training_program(object):
 
     def retranslateUi(self, dialog_training_program):
         _translate = QtCore.QCoreApplication.translate
-        dialog_training_program.setWindowTitle(_translate("dialog_training_program", "New Training Program"))
+        dialog_training_program.setWindowTitle(_translate("dialog_training_program", "Training Program"))
         self.label_tpr_name.setText(_translate("dialog_training_program", "&Name"))
         self.lineEdit_tpr_name.setPlaceholderText(_translate("dialog_training_program", "New Program"))
         self.label_tpr_description.setText(_translate("dialog_training_program", "&Description"))

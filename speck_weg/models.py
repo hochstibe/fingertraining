@@ -26,16 +26,18 @@ class TrainingPlan(Base):
 
     # orm definitions
     training_program = relationship('TrainingProgram', back_populates='training_plans')
+    training_exercises = relationship('TrainingExercise', back_populates='training_plan')
 
     def __repr__(self):
         return f'TrainingPlan(tpl_id={self.tpl_id!r}, tpl_name={self.tpl_name!r})'
 
 
-class TrainingExcercise(Base):
+class TrainingExercise(Base):
     # table definitions
     __table__ = tex_table
 
     # orm definitions
+    training_plan = relationship('TrainingPlan', back_populates='training_exercises')
 
     def __repr__(self):
         return f'TrainingExercise(tex_id={self.tex_id!r}, tex_name={self.tex_name!r})'

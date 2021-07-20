@@ -13,7 +13,7 @@ import PyQt5.QtCore
 from sqlalchemy import select
 
 from speck_weg.db import session
-from speck_weg.models import TrainingProgram
+from speck_weg.models import TrainingProgram, TrainingPlan
 
 from ui.main_window_ui import Ui_MainWindow_training
 from ui.training_program_ui import Ui_dialog_training_program
@@ -56,27 +56,15 @@ class Window(QMainWindow, Ui_MainWindow_training):
 
     def program_list_clicked(self):
         item = self.listWidget_program.currentItem()
-        print('Clicked on the program list', item, item.text())
-        if item.data(user_role):
-            print('data of the item:', item.data(user_role).training_plans)
-            self.refresh_plan_list(item.data(user_role).training_plans)
-        else:
-            print('no data, no object --> new??')
-            self.new_program()
+        print('Clicked on the program list', item.text())
+
+        self.refresh_plan_list(item.data(user_role))
 
     def new_program(self):
         dialog = ProgramDialog(self)
-
         dialog.pushButton_close.clicked.connect(self.refresh_program_list)
 
         dialog.exec()
-        # if new_tpr:
-        #     print('yay, a new object added')
-        #     session.add(self.tpr)
-        #     session.commit()
-        # else:
-        #     print('nothing added')
-        # self.refresh_program_list()
 
     def delete_program(self):
         print('deleting')
@@ -90,16 +78,33 @@ class Window(QMainWindow, Ui_MainWindow_training):
             print('no item selected, none deleted')
         self.refresh_program_list()
 
-    def refresh_plan_list(self, plans):
-
+    def refresh_plan_list(self, tpr: 'TrainingProgram'):
+        print('refreshing plans')
         self.listWidget_plan.clear()
 
-        for i, tpl in enumerate(plans):
+        for i, tpl in enumerate(tpr.training_plans):
             self.listWidget_plan.insertItem(i, tpl.tpl_name)
             self.listWidget_plan.item(i).setData(user_role, tpl)
 
     def plan_list_clicked(self):
+        item = self.listWidget_plan.currentItem()
+        print('Clicked on the plan list', item.text())
+
+        self.refresh_exercise_list(item.data(user_role))
+
+    def new_plan(self):
         pass
+
+    def delete_plan(self):
+        pass
+
+    def refresh_exercise_list(self, tpl: 'TrainingPlan'):
+        print('refreshing exercises')
+        self.listWidget_plan.clear()
+
+        for i, tpx in enumerate(tpl.training_exercises):
+            self.listWidget_plan.insertItem(i, tpx.tpx_name)
+            self.listWidget_plan.item(i).setData(user_role, tpx)
 
     @staticmethod
     def about():
@@ -145,6 +150,7 @@ class ProgramDialog(QDialog, Ui_dialog_training_program):
         )
         session.add(self.tpr)
         session.commit()
+        print('tpr added to the database')
 
     def set_edit_mode(self):
         self.pushButton_save.setEnabled(False)
@@ -153,11 +159,6 @@ class ProgramDialog(QDialog, Ui_dialog_training_program):
     def set_new_mode(self):
         self.pushButton_save.setEnabled(True)
         self.pushButton_apply.setEnabled(False)
-
-    # def exec_(self):
-    #     print('executing dialog')
-    #     self.exec_()
-    #     return self.tpr
 
 
 if __name__ == "__main__":

@@ -41,4 +41,5 @@ pyrcc5 -o ui/resources_rc.py ui/resources/resources.qrc
 pyuic5 --from-imports --output ui/main_window_ui.py ui/main_window.ui
 # Dialogs
 pyuic5 -o ui/training_program_ui.py ui/training_program.ui
+pyuic5 -o ui/training_plan_ui.py ui/training_plan.ui
 ```
