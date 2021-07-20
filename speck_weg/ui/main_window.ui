@@ -205,7 +205,7 @@
       </layout>
      </item>
      <item>
-      <widget class="QListView" name="listView"/>
+      <widget class="QListWidget" name="listWidget_exercise"/>
      </item>
     </layout>
    </widget>
