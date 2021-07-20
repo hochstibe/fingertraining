@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui/training_program.ui'
+# Form implementation generated from reading ui file 'speck_weg\ui\dialogs\training_program.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.4
 #

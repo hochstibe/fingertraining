@@ -1,6 +1,6 @@
 # fingertraining
 # Stefan Hochuli, 20.07.2021, 
-# Folder: speck_weg/ui/dialogs File: training_plan.py
+# Folder: speck_weg/ui/dialogs File: training_exercise.py
 #
 
 
@@ -8,30 +8,30 @@ from typing import TYPE_CHECKING
 
 from PyQt5.QtWidgets import QDialog
 
-from ...models import TrainingPlan
-from .training_plan_ui import Ui_dialog_training_plan
+from ...models import TrainingExercise
+from .training_exercise_ui import Ui_dialog_training_exercise
 
 if TYPE_CHECKING:
     from ...db import CRUD
-    from ...models import TrainingProgram
+    from ...models import TrainingPlan
 
 
-class PlanDialog(QDialog, Ui_dialog_training_plan):
+class ExerciseDialog(QDialog, Ui_dialog_training_exercise):
 
-    tpl: 'TrainingPlan' = None
+    tex: 'TrainingPlan' = None
 
-    def __init__(self, db: 'CRUD', parent=None, obj: 'TrainingPlan' = None, parent_tpr: 'TrainingProgram' = None):
+    def __init__(self, db: 'CRUD', parent=None, obj: 'TrainingExercise' = None, parent_tpl: 'TrainingPlan' = None):
         super().__init__(parent)
 
         self.db = db
 
-        self.tpl = obj
-        self.parent_tpr = parent_tpr
+        self.tex = obj
+        self.parent_tpl = parent_tpl
 
         self.setupUi(self)
         self.connect()
 
-        if self.tpl:
+        if self.tex:
             self.set_edit_mode()
         else:
             self.set_new_mode()
@@ -45,13 +45,13 @@ class PlanDialog(QDialog, Ui_dialog_training_plan):
 
     def save(self):
         # Return the object, add to the db from main window
-        self.tpl = TrainingPlan(
-            tpl_name=self.lineEdit_tpl_name.text(),
-            tpl_description=self.lineEdit_tpl_description.text(),
-            tpl_tpr_id=self.parent_tpr.tpr_id
+        self.tex = TrainingExercise(
+            tex_name=self.lineEdit_tex_name.text(),
+            tex_description=self.lineEdit_tex_description.text(),
+            tex_tpl_id=self.parent_tpl.tpl_id
         )
-        self.db.create(self.tpl)
-        print('tpl added to the database')
+        self.db.create(self.tex)
+        print('tex added to the database')
 
     def set_edit_mode(self):
         self.pushButton_save.setEnabled(False)

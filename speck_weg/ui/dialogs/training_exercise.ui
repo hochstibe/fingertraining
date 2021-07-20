@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>dialog_training_plan</class>
- <widget class="QDialog" name="dialog_training_plan">
+ <class>dialog_training_exercise</class>
+ <widget class="QDialog" name="dialog_training_exercise">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,23 +14,23 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Training Plan</string>
+   <string>Training Exercise</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QGridLayout" name="gridLayout">
      <item row="0" column="0">
-      <widget class="QLabel" name="label_tpl_name">
+      <widget class="QLabel" name="label_tex_name">
        <property name="text">
         <string>&amp;Name</string>
        </property>
        <property name="buddy">
-        <cstring>lineEdit_tpl_name</cstring>
+        <cstring>lineEdit_tex_name</cstring>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLineEdit" name="lineEdit_tpl_name">
+      <widget class="QLineEdit" name="lineEdit_tex_name">
        <property name="text">
         <string/>
        </property>
@@ -35,22 +38,22 @@
         <number>32767</number>
        </property>
        <property name="placeholderText">
-        <string>New Plan</string>
+        <string>New Exercise</string>
        </property>
       </widget>
      </item>
      <item row="1" column="0">
-      <widget class="QLabel" name="label_tpl_description">
+      <widget class="QLabel" name="label_tex_description">
        <property name="text">
         <string>&amp;Description</string>
        </property>
        <property name="buddy">
-        <cstring>lineEdit_tpl_description</cstring>
+        <cstring>lineEdit_tex_description</cstring>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="lineEdit_tpl_description">
+      <widget class="QLineEdit" name="lineEdit_tex_description">
        <property name="maxLength">
         <number>1023</number>
        </property>
@@ -119,7 +122,7 @@
   <connection>
    <sender>pushButton_close</sender>
    <signal>clicked()</signal>
-   <receiver>dialog_training_plan</receiver>
+   <receiver>dialog_training_exercise</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

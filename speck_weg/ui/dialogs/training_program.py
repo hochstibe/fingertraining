@@ -3,19 +3,25 @@
 # Folder: speck_weg/ui/dialogs File: training_program.py
 #
 
+from typing import TYPE_CHECKING
+
 from PyQt5.QtWidgets import QDialog
 
-from ...db import session
 from ...models import TrainingProgram
 from .training_program_ui import Ui_dialog_training_program
+
+if TYPE_CHECKING:
+    from ...db import CRUD
 
 
 class ProgramDialog(QDialog, Ui_dialog_training_program):
 
     tpr: 'TrainingProgram' = None
 
-    def __init__(self, parent=None, obj: 'TrainingProgram' = None):
+    def __init__(self, db: 'CRUD', parent=None, obj: 'TrainingProgram' = None):
         super().__init__(parent)
+
+        self.db = db
 
         self.tpr = obj
 
@@ -40,8 +46,7 @@ class ProgramDialog(QDialog, Ui_dialog_training_program):
             tpr_name=self.lineEdit_tpr_name.text(),
             tpr_description=self.lineEdit_tpr_description.text()
         )
-        session.add(self.tpr)
-        session.commit()
+        self.db.create(self.tpr)
         print('tpr added to the database')
 
     def set_edit_mode(self):

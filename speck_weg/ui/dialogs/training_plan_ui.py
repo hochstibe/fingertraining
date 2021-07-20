@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui/training_plan.ui'
+# Form implementation generated from reading ui file 'speck_weg\ui\dialogs\training_plan.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.4
 #
@@ -62,7 +62,7 @@ class Ui_dialog_training_plan(object):
         _translate = QtCore.QCoreApplication.translate
         dialog_training_plan.setWindowTitle(_translate("dialog_training_plan", "Training Plan"))
         self.label_tpl_name.setText(_translate("dialog_training_plan", "&Name"))
-        self.lineEdit_tpl_name.setPlaceholderText(_translate("dialog_training_plan", "New Program"))
+        self.lineEdit_tpl_name.setPlaceholderText(_translate("dialog_training_plan", "New Plan"))
         self.label_tpl_description.setText(_translate("dialog_training_plan", "&Description"))
         self.lineEdit_tpl_description.setPlaceholderText(_translate("dialog_training_plan", "Optional Description"))
         self.pushButton_apply.setText(_translate("dialog_training_plan", "&Apply"))
