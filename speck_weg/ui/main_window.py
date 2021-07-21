@@ -50,10 +50,12 @@ class Window(QMainWindow, Ui_MainWindow_training):
         programs = self.db.read_all(TrainingProgram)
 
         self.listWidget_program.clear()
+        self.listWidget_plan.clear()
+        self.listWidget_exercise.clear()
 
         for i, tpr in enumerate(programs):
             print(i, tpr)
-            self.listWidget_program.insertItem(i, tpr.tpr_name)
+            self.listWidget_program.insertItem(i, tpr.name)
             self.listWidget_program.item(i).setData(user_role, tpr)
 
     def program_list_clicked(self):
@@ -64,16 +66,18 @@ class Window(QMainWindow, Ui_MainWindow_training):
 
     def new_program(self):
         dialog = ProgramDialog(parent=self, db=self.db)
-        dialog.pushButton_close.clicked.connect(self.refresh_program_list)
-
         dialog.exec()
 
-    def delete_program(self):
-        print('deleting')
-        item = self.listWidget_program.currentItem()
+        # rejected handles escape-key, x and the close button (connected to reject()
+        if dialog.rejected:
+            self.refresh_program_list()
 
-        if item:
-            self.db.delete(item.data(user_role))
+    def delete_program(self):
+        print('deleting program')
+        program = self.listWidget_program.currentItem()
+
+        if program:
+            self.db.delete(program.data(user_role))
             print('item deleted')
         else:
             print('no item selected, none deleted')
@@ -82,6 +86,7 @@ class Window(QMainWindow, Ui_MainWindow_training):
     def refresh_plan_list(self):
         print('refreshing plans')
         self.listWidget_plan.clear()
+        self.listWidget_exercise.clear()
 
         # selected program
         program = self.listWidget_program.currentItem()
@@ -94,7 +99,7 @@ class Window(QMainWindow, Ui_MainWindow_training):
             plans = self.db.read(TrainingPlan, TrainingPlan.tpl_tpr_id, tpr.tpr_id)
 
             for i, tpl in enumerate(plans):
-                self.listWidget_plan.insertItem(i, tpl.tpl_name)
+                self.listWidget_plan.insertItem(i, tpl.name)
                 self.listWidget_plan.item(i).setData(user_role, tpl)
 
     def plan_list_clicked(self):
@@ -108,12 +113,14 @@ class Window(QMainWindow, Ui_MainWindow_training):
 
         if program:
             dialog = PlanDialog(parent=self, db=self.db, parent_tpr=program.data(user_role))
-            dialog.pushButton_close.clicked.connect(self.refresh_plan_list)
-
             dialog.exec()
 
+            # rejected handles escape-key, x and the close button (connected to reject()
+            if dialog.rejected:
+                self.refresh_plan_list()
+
     def delete_plan(self):
-        print('deleting')
+        print('deleting plan')
         plan = self.listWidget_plan.currentItem()
 
         if plan:
@@ -142,7 +149,7 @@ class Window(QMainWindow, Ui_MainWindow_training):
             exercises = self.db.read(TrainingExercise, TrainingExercise.tex_tpl_id, tpl.tpl_id)
 
             for i, tex in enumerate(exercises):
-                self.listWidget_exercise.insertItem(i, tex.tex_name)
+                self.listWidget_exercise.insertItem(i, tex.name)
                 self.listWidget_exercise.item(i).setData(user_role, tex)
 
     def exercise_list_clicked(self):
@@ -154,12 +161,14 @@ class Window(QMainWindow, Ui_MainWindow_training):
 
         if plan:
             dialog = ExerciseDialog(parent=self, db=self.db, parent_tpl=plan.data(user_role))
-            dialog.pushButton_close.clicked.connect(self.refresh_plan_list)
-
             dialog.exec()
 
+            # rejected handles escape-key, x and the close button (connected to reject()
+            if dialog.rejected:
+                self.refresh_exercise_list()
+
     def delete_exercise(self):
-        print('deleting')
+        print('deleting exercise')
         exercise = self.listWidget_exercise.currentItem()
 
         if exercise:

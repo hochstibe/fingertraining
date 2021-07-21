@@ -28,8 +28,16 @@
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
         <widget class="QLabel" name="label">
+         <property name="font">
+          <font>
+           <family>MS Shell Dlg 2</family>
+           <pointsize>10</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
          <property name="text">
-          <string>Program</string>
+          <string>Thema</string>
          </property>
         </widget>
        </item>
@@ -84,7 +92,7 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>240</x>
+      <x>250</x>
       <y>0</y>
       <width>221</width>
       <height>226</height>
@@ -95,6 +103,13 @@
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
         <widget class="QLabel" name="label_2">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
          <property name="text">
           <string>Plan</string>
          </property>
@@ -151,7 +166,7 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>470</x>
+      <x>480</x>
       <y>0</y>
       <width>211</width>
       <height>226</height>
@@ -162,8 +177,15 @@
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
         <widget class="QLabel" name="label_3">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
          <property name="text">
-          <string>Exercise</string>
+          <string>Übung</string>
          </property>
         </widget>
        </item>
@@ -221,14 +243,18 @@
    </property>
    <widget class="QMenu" name="menu_training">
     <property name="title">
-     <string>Trainings verwalten</string>
+     <string>Menu</string>
     </property>
-    <addaction name="action_new_exercise"/>
-   </widget>
-   <widget class="QMenu" name="menu_workout">
-    <property name="title">
-     <string>Workouts</string>
-    </property>
+    <widget class="QMenu" name="menuAdd">
+     <property name="title">
+      <string>Add</string>
+     </property>
+     <addaction name="actionNew_program"/>
+     <addaction name="actionNew_plan"/>
+     <addaction name="actionNew_exercise"/>
+    </widget>
+    <addaction name="menuAdd"/>
+    <addaction name="start_workout"/>
    </widget>
    <widget class="QMenu" name="menu_help">
     <property name="title">
@@ -237,7 +263,6 @@
     <addaction name="action_about"/>
    </widget>
    <addaction name="menu_training"/>
-   <addaction name="menu_workout"/>
    <addaction name="menu_help"/>
   </widget>
   <widget class="QToolBar" name="training_toolbar">
@@ -250,19 +275,19 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="action_new_exercise"/>
+   <addaction name="start_workout"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="action_new_exercise">
+  <action name="start_workout">
    <property name="icon">
     <iconset resource="resources/resources.qrc">
-     <normaloff>:/icons/plus-solid.svg</normaloff>:/icons/plus-solid.svg</iconset>
+     <normaloff>:/icons/dumbbell-solid.svg</normaloff>:/icons/dumbbell-solid.svg</iconset>
    </property>
    <property name="text">
-    <string>New Exercise</string>
+    <string>Start workout</string>
    </property>
    <property name="toolTip">
-    <string>Create a new Exercise</string>
+    <string>Start a new workout session</string>
    </property>
   </action>
   <action name="action_about">
@@ -272,6 +297,21 @@
    </property>
    <property name="text">
     <string>&amp;About</string>
+   </property>
+  </action>
+  <action name="actionNew_program">
+   <property name="text">
+    <string>New program</string>
+   </property>
+  </action>
+  <action name="actionNew_plan">
+   <property name="text">
+    <string>New plan</string>
+   </property>
+  </action>
+  <action name="actionNew_exercise">
+   <property name="text">
+    <string>New exercise</string>
    </property>
   </action>
  </widget>

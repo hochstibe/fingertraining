@@ -16,29 +16,29 @@ metadata = MetaData(naming_convention={
 tpr_table = Table(
     'training_program', metadata,
     Column('tpr_id', Integer, primary_key=True, autoincrement='auto'),
-    Column('tpr_name', String(63), nullable=False),
-    Column('tpr_description', String(1023), nullable=True),
+    Column('name', String(63), nullable=False),
+    Column('description', String(1023), nullable=True),
 
     # Constraints
-    UniqueConstraint('tpr_name')
+    UniqueConstraint('name'),
 )
 
 tpl_table = Table(
     'training_plan', metadata,
     Column('tpl_id', Integer, primary_key=True, autoincrement='auto'),
-    Column('tpl_name', String(63), nullable=False),
-    Column('tpl_description', String(1023), nullable=True),
-    Column('tpl_tpr_id', ForeignKey('training_program.tpr_id'), nullable=False)
+    Column('tpl_tpr_id', ForeignKey('training_program.tpr_id'), nullable=False),
+    Column('name', String(63), nullable=False),
+    Column('description', String(1023), nullable=True),
     # Todo: Unique constraint tpl_name + tpl_tpr_id
 )
 
 tex_table = Table(
     'training_exercise', metadata,
     Column('tex_id', Integer, primary_key=True, autoincrement='auto'),
-    Column('tex_name', String(63), nullable=False),
-    Column('tex_description', String(1023), nullable=True),
-    Column('tex_sequence', Integer, nullable=True),
-    Column('tex_tpl_id', ForeignKey('training_plan.tpl_id'))
+    Column('tex_tpl_id', ForeignKey('training_plan.tpl_id')),
+    Column('name', String(63), nullable=False),
+    Column('description', String(1023), nullable=True),
+    Column('sequence', Integer, nullable=True),
     # Todo: Unique constraint tex_name + tex_tpl_id
 )
 

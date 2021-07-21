@@ -46,9 +46,9 @@ class PlanDialog(QDialog, Ui_dialog_training_plan):
     def save(self):
         # Return the object, add to the db from main window
         self.tpl = TrainingPlan(
-            tpl_name=self.lineEdit_tpl_name.text(),
-            tpl_description=self.lineEdit_tpl_description.text(),
-            tpl_tpr_id=self.parent_tpr.tpr_id
+            tpl_tpr_id=self.parent_tpr.tpr_id,
+            name=self.lineEdit_name.text(),
+            description=self.lineEdit_description.text()
         )
         self.db.create(self.tpl)
         print('tpl added to the database')
@@ -56,7 +56,9 @@ class PlanDialog(QDialog, Ui_dialog_training_plan):
     def set_edit_mode(self):
         self.pushButton_save.setEnabled(False)
         self.pushButton_apply.setEnabled(True)
+        self.pushButton_apply.setDefault(True)
 
     def set_new_mode(self):
-        self.pushButton_save.setEnabled(True)
         self.pushButton_apply.setEnabled(False)
+        self.pushButton_save.setEnabled(True)
+        self.pushButton_save.setDefault(True)

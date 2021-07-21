@@ -43,8 +43,8 @@ class ProgramDialog(QDialog, Ui_dialog_training_program):
     def save(self):
         # Return the object, add to the db from main window
         self.tpr = TrainingProgram(
-            tpr_name=self.lineEdit_tpr_name.text(),
-            tpr_description=self.lineEdit_tpr_description.text()
+            name=self.lineEdit_name.text(),
+            description=self.lineEdit_description.text()
         )
         self.db.create(self.tpr)
         print('tpr added to the database')
@@ -52,7 +52,9 @@ class ProgramDialog(QDialog, Ui_dialog_training_program):
     def set_edit_mode(self):
         self.pushButton_save.setEnabled(False)
         self.pushButton_apply.setEnabled(True)
+        self.pushButton_apply.setDefault(True)
 
     def set_new_mode(self):
-        self.pushButton_save.setEnabled(True)
         self.pushButton_apply.setEnabled(False)
+        self.pushButton_save.setEnabled(True)
+        self.pushButton_save.setDefault(True)

@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="icons">
+    <file>dumbbell-solid.svg</file>
     <file>info-solid.svg</file>
     <file>minus-solid.svg</file>
     <file>plus-solid.svg</file>

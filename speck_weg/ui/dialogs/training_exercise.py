@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 class ExerciseDialog(QDialog, Ui_dialog_training_exercise):
 
-    tex: 'TrainingPlan' = None
+    tex: 'TrainingExercise' = None
 
     def __init__(self, db: 'CRUD', parent=None, obj: 'TrainingExercise' = None, parent_tpl: 'TrainingPlan' = None):
         super().__init__(parent)
@@ -46,9 +46,9 @@ class ExerciseDialog(QDialog, Ui_dialog_training_exercise):
     def save(self):
         # Return the object, add to the db from main window
         self.tex = TrainingExercise(
-            tex_name=self.lineEdit_tex_name.text(),
-            tex_description=self.lineEdit_tex_description.text(),
-            tex_tpl_id=self.parent_tpl.tpl_id
+            tex_tpl_id=self.parent_tpl.tpl_id,
+            name=self.lineEdit_name.text(),
+            description=self.lineEdit_description.text()
         )
         self.db.create(self.tex)
         print('tex added to the database')
@@ -56,7 +56,9 @@ class ExerciseDialog(QDialog, Ui_dialog_training_exercise):
     def set_edit_mode(self):
         self.pushButton_save.setEnabled(False)
         self.pushButton_apply.setEnabled(True)
+        self.pushButton_apply.setDefault(True)
 
     def set_new_mode(self):
-        self.pushButton_save.setEnabled(True)
         self.pushButton_apply.setEnabled(False)
+        self.pushButton_save.setEnabled(True)
+        self.pushButton_save.setDefault(True)
