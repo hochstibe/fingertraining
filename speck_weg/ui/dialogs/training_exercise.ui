@@ -14,7 +14,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Training Exercise</string>
+   <string>Übung</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -38,7 +38,7 @@
         <number>32767</number>
        </property>
        <property name="placeholderText">
-        <string>New Exercise</string>
+        <string>Neue Übung</string>
        </property>
        <property name="clearButtonEnabled">
         <bool>true</bool>
@@ -48,7 +48,7 @@
      <item row="1" column="0">
       <widget class="QLabel" name="label_description">
        <property name="text">
-        <string>&amp;Description</string>
+        <string>&amp;Beschreibung</string>
        </property>
        <property name="buddy">
         <cstring>lineEdit_description</cstring>
@@ -61,7 +61,7 @@
         <number>1023</number>
        </property>
        <property name="placeholderText">
-        <string>Optional Description</string>
+        <string>Optionale Beschreibung</string>
        </property>
        <property name="clearButtonEnabled">
         <bool>true</bool>
@@ -101,21 +101,21 @@
      <item>
       <widget class="QPushButton" name="pushButton_apply">
        <property name="text">
-        <string>&amp;Apply</string>
+        <string>&amp;Ändern</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="pushButton_save">
        <property name="text">
-        <string>&amp;Save</string>
+        <string>&amp;Speichern</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="pushButton_close">
        <property name="text">
-        <string>&amp;Close</string>
+        <string>&amp;Schliessen</string>
        </property>
       </widget>
      </item>

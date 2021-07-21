@@ -1,37 +1,35 @@
 # fingertraining
 # Stefan Hochuli, 20.07.2021, 
-# Folder: speck_weg/ui/dialogs File: training_plan.py
+# Folder: speck_weg/ui/dialogs File: training_theme.py
 #
-
 
 from typing import TYPE_CHECKING
 
 from PyQt5.QtWidgets import QDialog
 
-from ...models import TrainingPlan
-from .training_plan_ui import Ui_dialog_training_plan
+from ...models import TrainingTheme
+from .training_theme_ui import Ui_dialog_training_theme
 
 if TYPE_CHECKING:
     from ...db import CRUD
-    from ...models import TrainingProgram
 
 
-class PlanDialog(QDialog, Ui_dialog_training_plan):
+class ThemeDialog(QDialog, Ui_dialog_training_theme):
 
-    tpl: 'TrainingPlan' = None
+    tth: 'TrainingTheme' = None
 
-    def __init__(self, db: 'CRUD', parent=None, obj: 'TrainingPlan' = None, parent_tpr: 'TrainingProgram' = None):
+    def __init__(self, db: 'CRUD', parent=None, obj: 'TrainingTheme' = None):
         super().__init__(parent)
+        print('init theme')
 
         self.db = db
 
-        self.tpl = obj
-        self.parent_tpr = parent_tpr
+        self.tth = obj
 
         self.setupUi(self)
         self.connect()
 
-        if self.tpl:
+        if self.tth:
             self.set_edit_mode()
         else:
             self.set_new_mode()
@@ -45,13 +43,16 @@ class PlanDialog(QDialog, Ui_dialog_training_plan):
 
     def save(self):
         # Return the object, add to the db from main window
-        self.tpl = TrainingPlan(
-            tpl_tpr_id=self.parent_tpr.tpr_id,
+        self.tth = TrainingTheme(
             name=self.lineEdit_name.text(),
             description=self.lineEdit_description.text()
         )
-        self.db.create(self.tpl)
-        print('tpl added to the database')
+        self.db.create(self.tth)
+        print('theme added to the database')
+
+        # Clear after saving for adding a new one
+        self.lineEdit_name.clear()
+        self.lineEdit_description.clear()
 
     def set_edit_mode(self):
         self.pushButton_save.setEnabled(False)

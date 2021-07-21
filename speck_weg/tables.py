@@ -13,9 +13,9 @@ metadata = MetaData(naming_convention={
     "pk": "pk_%(table_name)s"
 })
 
-tpr_table = Table(
-    'training_program', metadata,
-    Column('tpr_id', Integer, primary_key=True, autoincrement='auto'),
+tth_table = Table(
+    'training_theme', metadata,
+    Column('tth_id', Integer, primary_key=True, autoincrement='auto'),
     Column('name', String(63), nullable=False),
     Column('description', String(1023), nullable=True),
 
@@ -23,10 +23,10 @@ tpr_table = Table(
     UniqueConstraint('name'),
 )
 
-tpl_table = Table(
-    'training_plan', metadata,
-    Column('tpl_id', Integer, primary_key=True, autoincrement='auto'),
-    Column('tpl_tpr_id', ForeignKey('training_program.tpr_id'), nullable=False),
+tpr_table = Table(
+    'training_program', metadata,
+    Column('tpr_id', Integer, primary_key=True, autoincrement='auto'),
+    Column('tpr_tth_id', ForeignKey('training_theme.tth_id'), nullable=False),
     Column('name', String(63), nullable=False),
     Column('description', String(1023), nullable=True),
     # Todo: Unique constraint tpl_name + tpl_tpr_id
@@ -35,7 +35,7 @@ tpl_table = Table(
 tex_table = Table(
     'training_exercise', metadata,
     Column('tex_id', Integer, primary_key=True, autoincrement='auto'),
-    Column('tex_tpl_id', ForeignKey('training_plan.tpl_id')),
+    Column('tex_tpr_id', ForeignKey('training_program.tpr_id')),
     Column('name', String(63), nullable=False),
     Column('description', String(1023), nullable=True),
     Column('sequence', Integer, nullable=True),

@@ -63,11 +63,11 @@ class Ui_dialog_training_exercise(object):
 
     def retranslateUi(self, dialog_training_exercise):
         _translate = QtCore.QCoreApplication.translate
-        dialog_training_exercise.setWindowTitle(_translate("dialog_training_exercise", "Training Exercise"))
+        dialog_training_exercise.setWindowTitle(_translate("dialog_training_exercise", "Übung"))
         self.label_name.setText(_translate("dialog_training_exercise", "&Name"))
-        self.lineEdit_name.setPlaceholderText(_translate("dialog_training_exercise", "New Exercise"))
-        self.label_description.setText(_translate("dialog_training_exercise", "&Description"))
-        self.lineEdit_description.setPlaceholderText(_translate("dialog_training_exercise", "Optional Description"))
-        self.pushButton_apply.setText(_translate("dialog_training_exercise", "&Apply"))
-        self.pushButton_save.setText(_translate("dialog_training_exercise", "&Save"))
-        self.pushButton_close.setText(_translate("dialog_training_exercise", "&Close"))
+        self.lineEdit_name.setPlaceholderText(_translate("dialog_training_exercise", "Neue Übung"))
+        self.label_description.setText(_translate("dialog_training_exercise", "&Beschreibung"))
+        self.lineEdit_description.setPlaceholderText(_translate("dialog_training_exercise", "Optionale Beschreibung"))
+        self.pushButton_apply.setText(_translate("dialog_training_exercise", "&Ändern"))
+        self.pushButton_save.setText(_translate("dialog_training_exercise", "&Speichern"))
+        self.pushButton_close.setText(_translate("dialog_training_exercise", "&Schliessen"))

@@ -42,7 +42,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton_add_program">
+        <widget class="QPushButton" name="pushButton_add_theme">
          <property name="toolTip">
           <string>New program</string>
          </property>
@@ -56,7 +56,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton_remove_program">
+        <widget class="QPushButton" name="pushButton_remove_theme">
          <property name="toolTip">
           <string>Remove program</string>
          </property>
@@ -85,7 +85,7 @@
       </layout>
      </item>
      <item>
-      <widget class="QListWidget" name="listWidget_program"/>
+      <widget class="QListWidget" name="listWidget_theme"/>
      </item>
     </layout>
    </widget>
@@ -111,12 +111,12 @@
           </font>
          </property>
          <property name="text">
-          <string>Plan</string>
+          <string>Programm</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton_add_plan">
+        <widget class="QPushButton" name="pushButton_add_program">
          <property name="toolTip">
           <string>New plan</string>
          </property>
@@ -130,7 +130,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton_remove_plan">
+        <widget class="QPushButton" name="pushButton_remove_program">
          <property name="toolTip">
           <string>Remove plan</string>
          </property>
@@ -159,7 +159,7 @@
       </layout>
      </item>
      <item>
-      <widget class="QListWidget" name="listWidget_plan"/>
+      <widget class="QListWidget" name="listWidget_program"/>
      </item>
     </layout>
    </widget>
@@ -247,7 +247,7 @@
     </property>
     <widget class="QMenu" name="menuAdd">
      <property name="title">
-      <string>Add</string>
+      <string>Hinzufügen</string>
      </property>
      <addaction name="actionNew_program"/>
      <addaction name="actionNew_plan"/>
@@ -258,7 +258,7 @@
    </widget>
    <widget class="QMenu" name="menu_help">
     <property name="title">
-     <string>&amp;Help</string>
+     <string>&amp;Hilfe</string>
     </property>
     <addaction name="action_about"/>
    </widget>
@@ -284,10 +284,10 @@
      <normaloff>:/icons/dumbbell-solid.svg</normaloff>:/icons/dumbbell-solid.svg</iconset>
    </property>
    <property name="text">
-    <string>Start workout</string>
+    <string>Workout starten</string>
    </property>
    <property name="toolTip">
-    <string>Start a new workout session</string>
+    <string>Eine neue workout session starten.</string>
    </property>
   </action>
   <action name="action_about">
@@ -301,17 +301,17 @@
   </action>
   <action name="actionNew_program">
    <property name="text">
-    <string>New program</string>
+    <string>Neues Thema</string>
    </property>
   </action>
   <action name="actionNew_plan">
    <property name="text">
-    <string>New plan</string>
+    <string>Neues Programm</string>
    </property>
   </action>
   <action name="actionNew_exercise">
    <property name="text">
-    <string>New exercise</string>
+    <string>Neue Übung</string>
    </property>
   </action>
  </widget>
