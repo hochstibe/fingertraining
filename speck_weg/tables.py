@@ -1,5 +1,5 @@
 # fingertraining
-# Stefan Hochuli, 14.07.2021, 
+# Stefan Hochuli, 14.07.2021,
 # Folder: speck_weg File: tables.py
 #
 
@@ -49,7 +49,8 @@ wse_table = Table(
     'workout_session', metadata,
     Column('wse_id', Integer, primary_key=True, autoincrement='auto'),
     Column('wse_tpr_id', ForeignKey('training_program.tpr_id')),
-    Column('date', DateTime(timezone=True), nullable=False, server_default=func.current_timestamp()),
+    Column('date', DateTime(timezone=True), nullable=False,
+           server_default=func.current_timestamp()),
     Column('comment', String(1023), nullable=True),
 )
 

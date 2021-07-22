@@ -1,5 +1,5 @@
 # fingertraining
-# Stefan Hochuli, 14.07.2021, 
+# Stefan Hochuli, 14.07.2021,
 # Folder: speck_weg File: db.py
 #
 

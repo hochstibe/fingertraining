@@ -43,3 +43,12 @@ pyuic5 --from-imports --output ui/main_window_ui.py ui/main_window.ui
 pyuic5 -o ui/training_program_ui.py ui/training_program.ui
 pyuic5 -o ui/training_plan_ui.py ui/training_plan.ui
 ```
+
+# Lint / Test / Build
+Configured int ``tox.ini`` and run with tox
+
+## Linter: flake8
+``tox -e lint`` runs only the linter environment.
+Alternative: ``flake8 speck_weg``
+
+Maybe: [Build with make](https://haseebmajid.dev/blog/using-tox-and-makefile-automation)?

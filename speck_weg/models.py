@@ -1,5 +1,5 @@
 # fingertraining
-# Stefan Hochuli, 14.07.2021, 
+# Stefan Hochuli, 14.07.2021,
 # Folder: speck_weg File: models.py
 #
 
@@ -17,7 +17,8 @@ class TrainingTheme(Base):
     training_programs = relationship('TrainingProgram', back_populates='training_theme')
 
     def __repr__(self):
-        return f'TrainingTheme(tth_id={self.tth_id!r}, name={self.name!r})'
+        return f'TrainingTheme(' \
+               f'tth_id={self.tth_id!r}, name={self.name!r})'
 
 
 class TrainingProgram(Base):
@@ -30,7 +31,8 @@ class TrainingProgram(Base):
     workout_sessions = relationship('WorkoutSession', back_populates='training_program')
 
     def __repr__(self):
-        return f'TrainingProgram(tpr_id={self.tth_id!r}, name={self.name!r})'
+        return f'TrainingProgram(' \
+               f'tpr_id={self.tth_id!r}, name={self.name!r})'
 
 
 class TrainingExercise(Base):
@@ -42,7 +44,8 @@ class TrainingExercise(Base):
     workout_exercises = relationship('WorkoutExercise', back_populates='training_exercise')
 
     def __repr__(self):
-        return f'TrainingExercise(tex_id={self.tex_id!r}, name={self.name!r})'
+        return f'TrainingExercise(' \
+               f'tex_id={self.tex_id!r}, name={self.name!r})'
 
 
 class WorkoutSession(Base):
@@ -54,7 +57,8 @@ class WorkoutSession(Base):
     workout_exercises = relationship('WorkoutExercise', back_populates='workout_session')
 
     def __repr__(self):
-        return f'WorkoutSession(wse_id={self.wse_id!r}, tse_tpr_id={self.wse_tpr_id}, date={self.date})'
+        return f'WorkoutSession(' \
+               f'wse_id=({self.wse_id!r}, tse_tpr_id={self.wse_tpr_id}, date={self.date})'
 
 
 class WorkoutExercise(Base):
@@ -66,4 +70,5 @@ class WorkoutExercise(Base):
     training_exercise = relationship('TrainingExercise', back_populates='workout_exercises')
 
     def __repr__(self):
-        return f'WorkoutExercise(wex_id={self.weg_id}, wex_wse_id={self.wex_wse_id}, wex_tex_id={self.wex_tex_id})'
+        return f'WorkoutExercise(' \
+               f'wex_id={self.weg_id}, wex_wse_id={self.wex_wse_id}, wex_tex_id={self.wex_tex_id})'

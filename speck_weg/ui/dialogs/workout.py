@@ -1,5 +1,5 @@
 # fingertraining
-# Stefan Hochuli, 22.07.2021, 
+# Stefan Hochuli, 22.07.2021,
 # Folder: speck_weg/ui/dialogs File: workout.py
 #
 
@@ -22,7 +22,8 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
 
     exercises: Dict['TrainingExercise', Optional[WorkoutExercise]] = []
 
-    def __init__(self, db: 'CRUD', parent=None, obj: 'WorkoutSession' = None, parent_tpr: 'TrainingProgram' = None):
+    def __init__(self, db: 'CRUD', parent=None,
+                 obj: 'WorkoutSession' = None, parent_tpr: 'TrainingProgram' = None):
         super().__init__(parent)
 
         self.db = db

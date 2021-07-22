@@ -1,5 +1,5 @@
 # fingertraining
-# Stefan Hochuli, 20.07.2021, 
+# Stefan Hochuli, 20.07.2021,
 # Folder: speck_weg/ui/dialogs File: training_exercise.py
 #
 
@@ -20,7 +20,8 @@ class ExerciseDialog(QDialog, Ui_dialog_training_exercise):
 
     tex: 'TrainingExercise' = None
 
-    def __init__(self, db: 'CRUD', parent=None, obj: 'TrainingExercise' = None, parent_tpr: 'TrainingProgram' = None):
+    def __init__(self, db: 'CRUD', parent=None,
+                 obj: 'TrainingExercise' = None, parent_tpr: 'TrainingProgram' = None):
         super().__init__(parent)
 
         self.db = db
