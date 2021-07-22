@@ -3,7 +3,10 @@
 # Folder: speck_weg File: tables.py
 #
 
-from sqlalchemy import MetaData, Table, Column, Integer, String, ForeignKey, UniqueConstraint
+from sqlalchemy import (MetaData, Table, Column,
+                        Integer, String, DateTime, Float,
+                        ForeignKey, UniqueConstraint)
+from sqlalchemy.sql import func
 
 metadata = MetaData(naming_convention={
     "ix": "ix_%(column_0_N_label)s",
@@ -42,3 +45,21 @@ tex_table = Table(
     # Todo: Unique constraint tex_name + tex_tpl_id
 )
 
+wse_table = Table(
+    'workout_session', metadata,
+    Column('wse_id', Integer, primary_key=True, autoincrement='auto'),
+    Column('wse_tpr_id', ForeignKey('training_program.tpr_id')),
+    Column('date', DateTime(timezone=True), nullable=False, server_default=func.current_timestamp()),
+    Column('comment', String(1023), nullable=True),
+)
+
+wex_table = Table(
+    'workout_exercise', metadata,
+    Column('wex_id', Integer, primary_key=True, autoincrement='auto'),
+    Column('wex_wse_id', ForeignKey('workout_session.wse_id')),
+    Column('wex_tex_id', ForeignKey('training_exercise.tex_id')),
+    Column('repetitions', Integer, nullable=False),
+    Column('weight', Float, nullable=True),
+    Column('duration', Integer, nullable=True),
+    Column('rate', Float, nullable=False),
+)

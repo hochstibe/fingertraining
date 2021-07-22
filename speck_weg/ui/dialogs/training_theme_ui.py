@@ -70,4 +70,4 @@ class Ui_dialog_training_theme(object):
         self.lineEdit_description.setPlaceholderText(_translate("dialog_training_theme", "Optionale Beschreibung"))
         self.pushButton_apply.setText(_translate("dialog_training_theme", "&Ändern"))
         self.pushButton_save.setText(_translate("dialog_training_theme", "&Speichern"))
-        self.pushButton_close.setText(_translate("dialog_training_theme", "Schliessen"))
+        self.pushButton_close.setText(_translate("dialog_training_theme", "S&chliessen"))

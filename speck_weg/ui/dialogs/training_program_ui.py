@@ -70,4 +70,4 @@ class Ui_dialog_training_program(object):
         self.lineEdit_description.setPlaceholderText(_translate("dialog_training_program", "Optionale Beschreibung"))
         self.pushButton_apply.setText(_translate("dialog_training_program", "&Ändern"))
         self.pushButton_save.setText(_translate("dialog_training_program", "&Speichern"))
-        self.pushButton_close.setText(_translate("dialog_training_program", "Schliessen"))
+        self.pushButton_close.setText(_translate("dialog_training_program", "S&chliessen"))

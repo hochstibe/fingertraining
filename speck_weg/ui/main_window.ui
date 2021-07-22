@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>697</width>
-    <height>559</height>
+    <width>706</width>
+    <height>363</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,8 +32,8 @@
           <font>
            <family>MS Shell Dlg 2</family>
            <pointsize>10</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
+           <weight>50</weight>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -106,8 +106,8 @@
          <property name="font">
           <font>
            <pointsize>10</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
+           <weight>50</weight>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -180,8 +180,8 @@
          <property name="font">
           <font>
            <pointsize>10</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
+           <weight>50</weight>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
@@ -237,7 +237,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>697</width>
+     <width>706</width>
      <height>22</height>
     </rect>
    </property>
