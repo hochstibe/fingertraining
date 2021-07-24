@@ -1,26 +1,24 @@
 # fingertraining
 # Stefan Hochuli, 22.07.2021,
-# Folder: speck_weg/ui/dialogs File: workout.py
+# Folder: speck_weg/ui File: dialog_workout.py
 #
 
 
-from typing import Dict, Optional, TYPE_CHECKING
+from typing import List, Optional, TYPE_CHECKING
 
 from PyQt5.QtWidgets import QDialog
 
-from ...models import WorkoutSession, WorkoutExercise, TrainingExercise
-from .workout_ui import Ui_Dialog_workout
+from ..models import WorkoutSession, WorkoutExercise, TrainingExercise
+from .dialog_workout_ui import Ui_Dialog_workout
 
 if TYPE_CHECKING:
-    from ...db import CRUD
-    from ...models import TrainingProgram
+    from ..db import CRUD
+    from ..models import TrainingProgram
 
 
 class WorkoutDialog(QDialog, Ui_Dialog_workout):
 
     session: 'WorkoutSession' = None
-
-    exercises: Dict['TrainingExercise', Optional[WorkoutExercise]] = []
 
     def __init__(self, db: 'CRUD', parent=None,
                  obj: 'WorkoutSession' = None, parent_tpr: 'TrainingProgram' = None):
@@ -34,14 +32,27 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
         self.setupUi(self)
         self.connect()
 
+        self.exercises: List[List[
+            int, Optional['TrainingExercise'], Optional[WorkoutExercise]]] = []
+        self.current_pos: int = -1
+
+        # Add the form layout to a frame (
+
         if self.session:
             self.set_edit_mode()
         else:
             self.set_new_mode()
 
-            self.session = WorkoutSession()
+            self.session = WorkoutSession(wse_tpr_id=self.parent_tpr.tpr_id)
             # Commit the workout session with the first exercise
             self.db.session.add(self.session)
+
+        # Generate a dict for all exercises
+        self.exercises = [[i+1, tex, None] for i, tex in enumerate(self.parent_tpr.training_exercises)]
+        # self.exercises.insert(0, [0, None, None])
+        # self.exercises.append([len(self.exercises), None, None])
+        print('exercises:')
+        print(self.exercises)
 
     def connect(self):
         """
@@ -67,6 +78,17 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
         # Clear after saving for adding a new one
         self.lineEdit_name.clear()
         self.lineEdit_description.clear()
+
+    def previous_exercise(self):
+        self.current_pos -= 1
+
+    def next_exercise(self):
+        self.current_pos += 1
+
+    def update_dialog(self, pos: int):
+
+        if pos == -1:
+            self.label_exercise.setText('Start')
 
     def set_edit_mode(self):
         # self.pushButton_save.setEnabled(False)

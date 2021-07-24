@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>dialog_training_theme</class>
- <widget class="QDialog" name="dialog_training_theme">
+ <class>Dialog_training_program</class>
+ <widget class="QDialog" name="Dialog_training_program">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
@@ -14,7 +14,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Thema</string>
+   <string>Programm</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -38,7 +38,7 @@
         <number>32767</number>
        </property>
        <property name="placeholderText">
-        <string>Neues Thema</string>
+        <string>Neues Programm</string>
        </property>
        <property name="clearButtonEnabled">
         <bool>true</bool>
@@ -46,7 +46,7 @@
       </widget>
      </item>
      <item row="1" column="0">
-      <widget class="QLabel" name="label_tpr_description">
+      <widget class="QLabel" name="label_description">
        <property name="text">
         <string>&amp;Beschreibung</string>
        </property>
@@ -128,7 +128,7 @@
   <connection>
    <sender>pushButton_close</sender>
    <signal>clicked()</signal>
-   <receiver>dialog_training_theme</receiver>
+   <receiver>Dialog_training_program</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

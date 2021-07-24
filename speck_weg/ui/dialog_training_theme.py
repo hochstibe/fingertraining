@@ -1,38 +1,35 @@
 # fingertraining
 # Stefan Hochuli, 20.07.2021,
-# Folder: speck_weg/ui/dialogs File: training_exercise.py
+# Folder: speck_weg/ui File: dialog_training_theme.py
 #
-
 
 from typing import TYPE_CHECKING
 
 from PyQt5.QtWidgets import QDialog
 
-from ...models import TrainingExercise
-from .training_exercise_ui import Ui_dialog_training_exercise
+from ..models import TrainingTheme
+from .dialog_training_theme_ui import Ui_Dialog_training_theme
 
 if TYPE_CHECKING:
-    from ...db import CRUD
-    from ...models import TrainingProgram
+    from ..db import CRUD
 
 
-class ExerciseDialog(QDialog, Ui_dialog_training_exercise):
+class ThemeDialog(QDialog, Ui_Dialog_training_theme):
 
-    tex: 'TrainingExercise' = None
+    tth: 'TrainingTheme' = None
 
-    def __init__(self, db: 'CRUD', parent=None,
-                 obj: 'TrainingExercise' = None, parent_tpr: 'TrainingProgram' = None):
+    def __init__(self, db: 'CRUD', parent=None, obj: 'TrainingTheme' = None):
         super().__init__(parent)
+        print('init theme')
 
         self.db = db
 
-        self.tex = obj
-        self.parent_tpr = parent_tpr
+        self.tth = obj
 
         self.setupUi(self)
         self.connect()
 
-        if self.tex:
+        if self.tth:
             self.set_edit_mode()
         else:
             self.set_new_mode()
@@ -46,13 +43,12 @@ class ExerciseDialog(QDialog, Ui_dialog_training_exercise):
 
     def save(self):
         # Return the object, add to the db from main window
-        self.tex = TrainingExercise(
-            tex_tpr_id=self.parent_tpr.tpr_id,
+        self.tth = TrainingTheme(
             name=self.lineEdit_name.text(),
             description=self.lineEdit_description.text()
         )
-        self.db.create(self.tex)
-        print('tex added to the database')
+        self.db.create(self.tth)
+        print('theme added to the database')
 
         # Clear after saving for adding a new one
         self.lineEdit_name.clear()

@@ -1,6 +1,6 @@
 # fingertraining
 # Stefan Hochuli, 20.07.2021,
-# Folder: speck_weg/ui/dialogs File: training_program.py
+# Folder: speck_weg/ui File: dialog_training_program.py
 #
 
 
@@ -8,15 +8,15 @@ from typing import TYPE_CHECKING
 
 from PyQt5.QtWidgets import QDialog
 
-from ...models import TrainingProgram
-from .training_program_ui import Ui_dialog_training_program
+from ..models import TrainingProgram
+from .dialog_training_program_ui import Ui_Dialog_training_program
 
 if TYPE_CHECKING:
-    from ...db import CRUD
-    from ...models import TrainingTheme
+    from ..db import CRUD
+    from ..models import TrainingTheme
 
 
-class PlanDialog(QDialog, Ui_dialog_training_program):
+class PlanDialog(QDialog, Ui_Dialog_training_program):
 
     tpr: 'TrainingProgram' = None
 

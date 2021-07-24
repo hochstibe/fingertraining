@@ -7,9 +7,9 @@ from typing import TYPE_CHECKING
 import PyQt5.QtCore
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
 
-from .dialogs import ThemeDialog, PlanDialog, ExerciseDialog
-from ..models import TrainingTheme, TrainingProgram, TrainingExercise
+from . import ThemeDialog, PlanDialog, ExerciseDialog, WorkoutDialog
 from .main_window_ui import Ui_MainWindow_training
+from ..models import TrainingTheme, TrainingProgram, TrainingExercise
 
 if TYPE_CHECKING:
     from ..db import CRUD
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 user_role = PyQt5.QtCore.Qt.UserRole
 
 
-class Window(QMainWindow, Ui_MainWindow_training):
+class MainWindow(QMainWindow, Ui_MainWindow_training):
     def __init__(self, db: 'CRUD', parent=None):
         super().__init__(parent)
 
@@ -44,6 +44,9 @@ class Window(QMainWindow, Ui_MainWindow_training):
         self.listWidget_exercise.clicked.connect(self.exercise_list_clicked)
         self.pushButton_add_exercise.clicked.connect(self.new_exercise)
         self.pushButton_remove_exercise.clicked.connect(self.delete_exercise)
+
+        # Workout
+        self.action_start_workout.triggered.connect(self.start_workout)
 
     def refresh_theme_list(self):
         print('refreshing list')
@@ -187,6 +190,27 @@ class Window(QMainWindow, Ui_MainWindow_training):
         # if program:
         self.refresh_exercise_list()
 
+    def start_workout(self):
+        print('starting the workout dialog')
+
+        program = self.listWidget_program.currentItem()
+
+        if program:
+            dialog = WorkoutDialog(db=self.db, parent=self, parent_tpr=program.data(user_role))
+
+            dialog.exec()
+
+        else:
+            print('No program selected')
+            msg = QMessageBox()
+
+            msg.setIcon(QMessageBox.Information)
+            msg.setWindowTitle('Kein Programm ausgewählt')
+            msg.setText('Bitte wählen Sie ein Programm aus, um ein Workout zu starten.')
+            msg.setStandardButtons(QMessageBox.Ok)
+
+            msg.exec()
+
     @staticmethod
     def about():
         msg = QMessageBox()
@@ -196,4 +220,4 @@ class Window(QMainWindow, Ui_MainWindow_training):
         msg.setInformativeText('Stefan Hochuli, Copyright 2021')
         msg.setStandardButtons(QMessageBox.Close)
 
-        msg.exec_()
+        msg.exec()

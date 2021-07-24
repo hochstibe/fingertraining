@@ -7,7 +7,7 @@ import sys
 
 from PyQt5.QtWidgets import QApplication
 
-from speck_weg.ui.main_window import Window
+from speck_weg.ui.main_window import MainWindow
 from speck_weg.db import CRUD
 
 
@@ -18,6 +18,6 @@ if __name__ == "__main__":
 
     # Start ui
     app = QApplication(sys.argv)
-    win = Window(db)
+    win = MainWindow(db)
     win.show()
     sys.exit(app.exec())

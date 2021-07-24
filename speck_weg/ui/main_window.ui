@@ -254,7 +254,7 @@
      <addaction name="actionNew_exercise"/>
     </widget>
     <addaction name="menuAdd"/>
-    <addaction name="start_workout"/>
+    <addaction name="action_start_workout"/>
    </widget>
    <widget class="QMenu" name="menu_help">
     <property name="title">
@@ -275,10 +275,10 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="start_workout"/>
+   <addaction name="action_start_workout"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="start_workout">
+  <action name="action_start_workout">
    <property name="icon">
     <iconset resource="resources/resources.qrc">
      <normaloff>:/icons/dumbbell-solid.svg</normaloff>:/icons/dumbbell-solid.svg</iconset>

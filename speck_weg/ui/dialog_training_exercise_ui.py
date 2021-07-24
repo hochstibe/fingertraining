@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'speck_weg\ui\dialogs\training_program.ui'
+# Form implementation generated from reading ui file 'speck_weg\ui\dialog_training_exercise.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.4
 #
@@ -11,28 +11,28 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_dialog_training_program(object):
-    def setupUi(self, dialog_training_program):
-        dialog_training_program.setObjectName("dialog_training_program")
-        dialog_training_program.setWindowModality(QtCore.Qt.ApplicationModal)
-        dialog_training_program.resize(427, 167)
-        self.verticalLayout = QtWidgets.QVBoxLayout(dialog_training_program)
+class Ui_Dialog_training_exercise(object):
+    def setupUi(self, Dialog_training_exercise):
+        Dialog_training_exercise.setObjectName("Dialog_training_exercise")
+        Dialog_training_exercise.setWindowModality(QtCore.Qt.ApplicationModal)
+        Dialog_training_exercise.resize(427, 167)
+        self.verticalLayout = QtWidgets.QVBoxLayout(Dialog_training_exercise)
         self.verticalLayout.setObjectName("verticalLayout")
         self.gridLayout = QtWidgets.QGridLayout()
         self.gridLayout.setObjectName("gridLayout")
-        self.label_name = QtWidgets.QLabel(dialog_training_program)
+        self.label_name = QtWidgets.QLabel(Dialog_training_exercise)
         self.label_name.setObjectName("label_name")
         self.gridLayout.addWidget(self.label_name, 0, 0, 1, 1)
-        self.lineEdit_name = QtWidgets.QLineEdit(dialog_training_program)
+        self.lineEdit_name = QtWidgets.QLineEdit(Dialog_training_exercise)
         self.lineEdit_name.setText("")
         self.lineEdit_name.setMaxLength(32767)
         self.lineEdit_name.setClearButtonEnabled(True)
         self.lineEdit_name.setObjectName("lineEdit_name")
         self.gridLayout.addWidget(self.lineEdit_name, 0, 1, 1, 1)
-        self.label_description = QtWidgets.QLabel(dialog_training_program)
+        self.label_description = QtWidgets.QLabel(Dialog_training_exercise)
         self.label_description.setObjectName("label_description")
         self.gridLayout.addWidget(self.label_description, 1, 0, 1, 1)
-        self.lineEdit_description = QtWidgets.QLineEdit(dialog_training_program)
+        self.lineEdit_description = QtWidgets.QLineEdit(Dialog_training_exercise)
         self.lineEdit_description.setMaxLength(1023)
         self.lineEdit_description.setClearButtonEnabled(True)
         self.lineEdit_description.setObjectName("lineEdit_description")
@@ -44,30 +44,30 @@ class Ui_dialog_training_program(object):
         self.horizontalLayout.setObjectName("horizontalLayout")
         spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem1)
-        self.pushButton_apply = QtWidgets.QPushButton(dialog_training_program)
+        self.pushButton_apply = QtWidgets.QPushButton(Dialog_training_exercise)
         self.pushButton_apply.setObjectName("pushButton_apply")
         self.horizontalLayout.addWidget(self.pushButton_apply)
-        self.pushButton_save = QtWidgets.QPushButton(dialog_training_program)
+        self.pushButton_save = QtWidgets.QPushButton(Dialog_training_exercise)
         self.pushButton_save.setObjectName("pushButton_save")
         self.horizontalLayout.addWidget(self.pushButton_save)
-        self.pushButton_close = QtWidgets.QPushButton(dialog_training_program)
+        self.pushButton_close = QtWidgets.QPushButton(Dialog_training_exercise)
         self.pushButton_close.setObjectName("pushButton_close")
         self.horizontalLayout.addWidget(self.pushButton_close)
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.label_name.setBuddy(self.lineEdit_name)
         self.label_description.setBuddy(self.lineEdit_description)
 
-        self.retranslateUi(dialog_training_program)
-        self.pushButton_close.clicked.connect(dialog_training_program.reject)
-        QtCore.QMetaObject.connectSlotsByName(dialog_training_program)
+        self.retranslateUi(Dialog_training_exercise)
+        self.pushButton_close.clicked.connect(Dialog_training_exercise.reject)
+        QtCore.QMetaObject.connectSlotsByName(Dialog_training_exercise)
 
-    def retranslateUi(self, dialog_training_program):
+    def retranslateUi(self, Dialog_training_exercise):
         _translate = QtCore.QCoreApplication.translate
-        dialog_training_program.setWindowTitle(_translate("dialog_training_program", "Programm"))
-        self.label_name.setText(_translate("dialog_training_program", "&Name"))
-        self.lineEdit_name.setPlaceholderText(_translate("dialog_training_program", "Neues Programm"))
-        self.label_description.setText(_translate("dialog_training_program", "&Beschreibung"))
-        self.lineEdit_description.setPlaceholderText(_translate("dialog_training_program", "Optionale Beschreibung"))
-        self.pushButton_apply.setText(_translate("dialog_training_program", "&Ändern"))
-        self.pushButton_save.setText(_translate("dialog_training_program", "&Speichern"))
-        self.pushButton_close.setText(_translate("dialog_training_program", "S&chliessen"))
+        Dialog_training_exercise.setWindowTitle(_translate("Dialog_training_exercise", "Übung"))
+        self.label_name.setText(_translate("Dialog_training_exercise", "&Name"))
+        self.lineEdit_name.setPlaceholderText(_translate("Dialog_training_exercise", "Neue Übung"))
+        self.label_description.setText(_translate("Dialog_training_exercise", "&Beschreibung"))
+        self.lineEdit_description.setPlaceholderText(_translate("Dialog_training_exercise", "Optionale Beschreibung"))
+        self.pushButton_apply.setText(_translate("Dialog_training_exercise", "&Ändern"))
+        self.pushButton_save.setText(_translate("Dialog_training_exercise", "&Speichern"))
+        self.pushButton_close.setText(_translate("Dialog_training_exercise", "S&chliessen"))

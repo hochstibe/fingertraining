@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'speck_weg\ui\dialogs\workout.ui'
+# Form implementation generated from reading ui file 'speck_weg\ui\dialog_workout.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.4
 #
@@ -14,10 +14,10 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog_workout(object):
     def setupUi(self, Dialog_workout):
         Dialog_workout.setObjectName("Dialog_workout")
-        Dialog_workout.resize(276, 248)
+        Dialog_workout.resize(405, 389)
         self.verticalLayout = QtWidgets.QVBoxLayout(Dialog_workout)
         self.verticalLayout.setObjectName("verticalLayout")
-        spacerItem = QtWidgets.QSpacerItem(20, 34, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem = QtWidgets.QSpacerItem(17, 8, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem)
         self.label_program = QtWidgets.QLabel(Dialog_workout)
         self.label_program.setAlignment(QtCore.Qt.AlignCenter)
@@ -30,7 +30,7 @@ class Ui_Dialog_workout(object):
         self.label_exercise.setAlignment(QtCore.Qt.AlignCenter)
         self.label_exercise.setObjectName("label_exercise")
         self.verticalLayout.addWidget(self.label_exercise)
-        spacerItem1 = QtWidgets.QSpacerItem(20, 14, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem1 = QtWidgets.QSpacerItem(17, 0, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem1)
         self.formLayout = QtWidgets.QFormLayout()
         self.formLayout.setObjectName("formLayout")
@@ -46,8 +46,14 @@ class Ui_Dialog_workout(object):
         self.lineEdit_weight = QtWidgets.QLineEdit(Dialog_workout)
         self.lineEdit_weight.setObjectName("lineEdit_weight")
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.lineEdit_weight)
+        self.label_comment = QtWidgets.QLabel(Dialog_workout)
+        self.label_comment.setObjectName("label_comment")
+        self.formLayout.setWidget(2, QtWidgets.QFormLayout.LabelRole, self.label_comment)
+        self.textEdit_comment = QtWidgets.QTextEdit(Dialog_workout)
+        self.textEdit_comment.setObjectName("textEdit_comment")
+        self.formLayout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.textEdit_comment)
         self.verticalLayout.addLayout(self.formLayout)
-        spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem2 = QtWidgets.QSpacerItem(17, 14, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem2)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
@@ -104,9 +110,11 @@ class Ui_Dialog_workout(object):
         self.lineEdit_repetitions.setPlaceholderText(_translate("Dialog_workout", "Anzahl Widerholungen"))
         self.label_weight.setText(_translate("Dialog_workout", "Gewicht"))
         self.lineEdit_weight.setPlaceholderText(_translate("Dialog_workout", "[kg] oder Verhältnis"))
+        self.label_comment.setText(_translate("Dialog_workout", "Kommentar"))
+        self.textEdit_comment.setPlaceholderText(_translate("Dialog_workout", "Optionaler Kommentar"))
         self.pushButton_previous.setToolTip(_translate("Dialog_workout", "Vorherige Übung"))
         self.pushButton_save_exercise.setToolTip(_translate("Dialog_workout", "Speichern und zur nächsten Übung springen"))
         self.pushButton_save_exercise.setText(_translate("Dialog_workout", "&Speichern"))
         self.pushButton_next.setToolTip(_translate("Dialog_workout", "Nächste Übung"))
         self.pushButton_close.setText(_translate("Dialog_workout", "S&chliessen"))
-import resources_rc
+from . import resources_rc
