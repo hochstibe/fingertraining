@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>405</width>
-    <height>389</height>
+    <width>441</width>
+    <height>465</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -73,17 +73,20 @@
      <item row="0" column="0">
       <widget class="QLabel" name="label_repetitions">
        <property name="text">
-        <string>Widerholungen</string>
+        <string>Wiederholungen</string>
        </property>
        <property name="buddy">
-        <cstring>lineEdit_repetitions</cstring>
+        <cstring>spinBox_repetitions</cstring>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLineEdit" name="lineEdit_repetitions">
-       <property name="placeholderText">
-        <string>Anzahl Widerholungen</string>
+      <widget class="QSpinBox" name="spinBox_repetitions">
+       <property name="toolTip">
+        <string>Anzahl Wiederholungen</string>
+       </property>
+       <property name="value">
+        <number>10</number>
        </property>
       </widget>
      </item>
@@ -93,25 +96,51 @@
         <string>Gewicht</string>
        </property>
        <property name="buddy">
-        <cstring>lineEdit_weight</cstring>
+        <cstring>doubleSpinBox_weight</cstring>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="lineEdit_weight">
-       <property name="placeholderText">
-        <string>[kg] oder Verhältnis</string>
+      <widget class="QDoubleSpinBox" name="doubleSpinBox_weight">
+       <property name="toolTip">
+        <string>Gewicht in [kg] oder ein Verhältnis angeben.</string>
+       </property>
+       <property name="maximum">
+        <double>199.990000000000009</double>
+       </property>
+       <property name="value">
+        <double>1.000000000000000</double>
        </property>
       </widget>
      </item>
      <item row="2" column="0">
-      <widget class="QLabel" name="label_comment">
+      <widget class="QLabel" name="label_ratio">
        <property name="text">
-        <string>Kommentar</string>
+        <string>Verhältnis</string>
        </property>
       </widget>
      </item>
      <item row="2" column="1">
+      <widget class="QDoubleSpinBox" name="doubleSpinBox_ratio">
+       <property name="toolTip">
+        <string>Gewicht in [kg] oder ein Verhältnis angeben.</string>
+       </property>
+       <property name="maximum">
+        <double>9.990000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_comment">
+       <property name="text">
+        <string>Kommentar</string>
+       </property>
+       <property name="buddy">
+        <cstring>textEdit_comment</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
       <widget class="QTextEdit" name="textEdit_comment">
        <property name="placeholderText">
         <string>Optionaler Kommentar</string>
@@ -157,7 +186,7 @@
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="../resources/resources.qrc">
+        <iconset resource="resources/resources.qrc">
          <normaloff>:/icons/arrow-left-solid.svg</normaloff>:/icons/arrow-left-solid.svg</iconset>
        </property>
       </widget>
@@ -184,7 +213,7 @@
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="../resources/resources.qrc">
+        <iconset resource="resources/resources.qrc">
          <normaloff>:/icons/arrow-right-solid.svg</normaloff>:/icons/arrow-right-solid.svg</iconset>
        </property>
        <property name="default">
@@ -240,14 +269,12 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>lineEdit_repetitions</tabstop>
-  <tabstop>lineEdit_weight</tabstop>
   <tabstop>pushButton_next</tabstop>
   <tabstop>pushButton_close</tabstop>
   <tabstop>pushButton_previous</tabstop>
  </tabstops>
  <resources>
-  <include location="../resources/resources.qrc"/>
+  <include location="resources/resources.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -257,8 +284,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>276</x>
-     <y>278</y>
+     <x>394</x>
+     <y>378</y>
     </hint>
     <hint type="destinationlabel">
      <x>298</x>

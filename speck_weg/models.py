@@ -4,7 +4,7 @@
 #
 
 from sqlalchemy.orm import declarative_base, relationship
-from .tables import tth_table, tpr_table, tex_table, wse_table, wex_table
+from .tables import tth_table, tpr_table, tpr_tex_table, tex_table, wse_table, wex_table, usr_table
 
 Base = declarative_base()
 
@@ -27,7 +27,8 @@ class TrainingProgram(Base):
 
     # orm definitions
     training_theme = relationship('TrainingTheme', back_populates='training_programs')
-    training_exercises = relationship('TrainingExercise', back_populates='training_program')
+    training_exercises = relationship('TrainingExercise', secondary=tpr_tex_table,
+                                      back_populates='training_programs')
     workout_sessions = relationship('WorkoutSession', back_populates='training_program')
 
     def __repr__(self):
@@ -40,7 +41,8 @@ class TrainingExercise(Base):
     __table__ = tex_table
 
     # orm definitions
-    training_program = relationship('TrainingProgram', back_populates='training_exercises')
+    training_programs = relationship('TrainingProgram', secondary=tpr_tex_table,
+                                     back_populates='training_exercises')
     workout_exercises = relationship('WorkoutExercise', back_populates='training_exercise')
 
     def __repr__(self):
@@ -71,4 +73,13 @@ class WorkoutExercise(Base):
 
     def __repr__(self):
         return f'WorkoutExercise(' \
-               f'wex_id={self.weg_id}, wex_wse_id={self.wex_wse_id}, wex_tex_id={self.wex_tex_id})'
+               f'wex_id={self.wex_id}, wex_wse_id={self.wex_wse_id}, wex_tex_id={self.wex_tex_id})'
+
+
+class User(Base):
+
+    # table definitions
+    __table__ = usr_table
+
+    def __repr__(self):
+        return f'User(usr_id={self.usr_id}, name={self.name} weight={self.weight}'

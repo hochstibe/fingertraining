@@ -35,10 +35,16 @@ tpr_table = Table(
     # Todo: Unique constraint tpl_name + tpl_tpr_id
 )
 
+tpr_tex_table = Table(
+    'training_program_exercise', metadata,
+    Column('tpe_tpr_id', ForeignKey('training_program.tpr_id'), primary_key=True, nullable=False),
+    Column('tpe_tex_id', ForeignKey('training_exercise.tex_id'), primary_key=True, nullable=False),
+)
+
 tex_table = Table(
     'training_exercise', metadata,
     Column('tex_id', Integer, primary_key=True, autoincrement='auto'),
-    Column('tex_tpr_id', ForeignKey('training_program.tpr_id')),
+    # Column('tex_tpr_id', ForeignKey('training_program.tpr_id')),
     Column('name', String(63), nullable=False),
     Column('description', String(1023), nullable=True),
     Column('sequence', Integer, nullable=True),
@@ -62,5 +68,13 @@ wex_table = Table(
     Column('repetitions', Integer, nullable=False),
     Column('weight', Float, nullable=True),
     Column('duration', Integer, nullable=True),
-    Column('rate', Float, nullable=False),
+    Column('ratio', Float, nullable=False),
+    Column('comment', String(1023), nullable=True),
+)
+
+usr_table = Table(
+    'user', metadata,
+    Column('usr_id', Integer, primary_key=True, autoincrement='auto'),
+    Column('name', String(255), nullable=False),
+    Column('weight', Float, nullable=False),
 )

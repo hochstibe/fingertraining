@@ -53,6 +53,8 @@ class ThemeDialog(QDialog, Ui_Dialog_training_theme):
         # Clear after saving for adding a new one
         self.lineEdit_name.clear()
         self.lineEdit_description.clear()
+        # Reset the focus on the first lineEdit
+        self.lineEdit_name.setFocus()
 
     def set_edit_mode(self):
         self.pushButton_save.setEnabled(False)

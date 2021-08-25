@@ -254,6 +254,7 @@
      <addaction name="actionNew_exercise"/>
     </widget>
     <addaction name="menuAdd"/>
+    <addaction name="action_user_info"/>
     <addaction name="action_start_workout"/>
    </widget>
    <widget class="QMenu" name="menu_help">
@@ -275,6 +276,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="action_user_info"/>
    <addaction name="action_start_workout"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -288,6 +290,9 @@
    </property>
    <property name="toolTip">
     <string>Eine neue workout session starten.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
    </property>
   </action>
   <action name="action_about">
@@ -312,6 +317,21 @@
   <action name="actionNew_exercise">
    <property name="text">
     <string>Neue Übung</string>
+   </property>
+  </action>
+  <action name="action_user_info">
+   <property name="icon">
+    <iconset resource="resources/resources.qrc">
+     <normaloff>:/icons/user-alt-solid.svg</normaloff>:/icons/user-alt-solid.svg</iconset>
+   </property>
+   <property name="text">
+    <string>User Info</string>
+   </property>
+   <property name="toolTip">
+    <string>User Informationen (Gewicht)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+U</string>
    </property>
   </action>
  </widget>

@@ -36,25 +36,63 @@ class CRUD:
 
     def create(self, obj: 'DeclarativeMeta'):
 
-        self.session.add(obj)
-        self.session.commit()
+        try:
+            self.session.add(obj)
+            self.session.commit()
+        except Exception as exc:
+            print(exc)
+            raise exc
+
+    def read_first(self, cls: Type['DeclarativeMeta']) -> Any:
+
+        stmt = select(cls)
+
+        try:
+            res = self.session.execute(stmt).scalars().first()
+        except Exception as exc:
+            print(exc)
+            raise exc
+
+        return res
 
     def read_all(self, cls: Type['DeclarativeMeta']) -> List[Any]:
 
         stmt = select(cls)
 
         # without scalars --> rows with lists of obj
-        return self.session.execute(stmt).scalars()
+        try:
+            res = self.session.execute(stmt).scalars()
+        except Exception as exc:
+            print(exc)
+            raise exc
+
+        return res
+
+    def read_stmt(self, stmt):
+        try:
+            res = self.session.execute(stmt).scalars()
+        except Exception as exc:
+            print(exc)
+            raise exc
+
+        return res
 
     def read(self, cls: Type['DeclarativeMeta'], column: 'Column', value: int):
 
         print('db_read')
         stmt = select(cls).where(column == value)
 
-        return self.session.execute(stmt).scalars()
+        try:
+            res = self.session.execute(stmt).scalars()
+        except Exception as exc:
+            print(exc)
+            raise exc
+
+        return res
 
     def update(self):
-        pass
+        # commit recent changes
+        self.session.commit()
 
     def delete(self, obj: 'DeclarativeMeta'):
 

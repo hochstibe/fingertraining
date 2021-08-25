@@ -6,10 +6,12 @@
 from typing import TYPE_CHECKING
 import PyQt5.QtCore
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
+from sqlalchemy import select
 
-from . import ThemeDialog, PlanDialog, ExerciseDialog, WorkoutDialog
+from . import ThemeDialog, PlanDialog, ExerciseDialog, WorkoutDialog, UserDialog
 from .main_window_ui import Ui_MainWindow_training
-from ..models import TrainingTheme, TrainingProgram, TrainingExercise
+from ..models import TrainingTheme, TrainingProgram, TrainingExercise, User
+from ..tables import tpr_tex_table
 
 if TYPE_CHECKING:
     from ..db import CRUD
@@ -26,6 +28,12 @@ class MainWindow(QMainWindow, Ui_MainWindow_training):
         self.setupUi(self)
         self.refresh_theme_list()
         self.connect()
+
+        # There must be one user in the database
+        self.usr = self.db.read_first(User)
+
+        if not self.usr:
+            self.action_start_workout.setEnabled(False)
 
     def connect(self):
         """
@@ -45,7 +53,8 @@ class MainWindow(QMainWindow, Ui_MainWindow_training):
         self.pushButton_add_exercise.clicked.connect(self.new_exercise)
         self.pushButton_remove_exercise.clicked.connect(self.delete_exercise)
 
-        # Workout
+        # Actions: User, Workout
+        self.action_user_info.triggered.connect(self.edit_user)
         self.action_start_workout.triggered.connect(self.start_workout)
 
     def refresh_theme_list(self):
@@ -63,7 +72,7 @@ class MainWindow(QMainWindow, Ui_MainWindow_training):
 
     def theme_list_clicked(self):
         theme = self.listWidget_theme.currentItem()
-        print('Clicked on the program list', theme.text())
+        print('Clicked on the program theme', theme.text())
 
         self.refresh_program_list()
 
@@ -149,9 +158,14 @@ class MainWindow(QMainWindow, Ui_MainWindow_training):
         # Todo: maybe simpler: use the tpr object in the listWidget
 
         if program:
+            print('refresh exercises for the selected program', program.text())
             tpr = program.data(user_role)
             # read all plans from db related to the program
-            exercises = self.db.read(TrainingExercise, TrainingExercise.tex_tpr_id, tpr.tpr_id)
+            stmt = select(
+                TrainingExercise).join(
+                TrainingExercise.training_programs).where(
+                TrainingProgram.tpr_id == tpr.tpr_id)
+            exercises = self.db.read_stmt(stmt)
 
             for i, tex in enumerate(exercises):
                 self.listWidget_exercise.insertItem(i, tex.name)
@@ -189,6 +203,20 @@ class MainWindow(QMainWindow, Ui_MainWindow_training):
         # program = self.listWidget_theme.currentItem()
         # if program:
         self.refresh_exercise_list()
+
+    def edit_user(self):
+        print('editing user data', self.usr)
+
+        dialog = UserDialog(db=self.db, parent=self, obj=self.usr)
+        dialog.exec()
+
+        # There must be one user in the database
+        self.usr = self.db.read_first(User)
+
+        if self.usr:
+            self.action_start_workout.setEnabled(True)
+        else:
+            self.action_start_workout.setEnabled(False)
 
     def start_workout(self):
         print('starting the workout dialog')

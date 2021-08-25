@@ -14,5 +14,6 @@ venv\Scripts\pyuic5 --from-imports -o speck_weg\ui\dialog_training_theme_ui.py s
 venv\Scripts\pyuic5 --from-imports -o speck_weg\ui\dialog_training_program_ui.py speck_weg\ui\dialog_training_program.ui
 venv\Scripts\pyuic5 --from-imports -o speck_weg\ui\dialog_training_exercise_ui.py speck_weg\ui\dialog_training_exercise.ui
 venv\Scripts\pyuic5 --from-imports -o speck_weg\ui\dialog_workout_ui.py speck_weg\ui\dialog_workout.ui
+venv\Scripts\pyuic5 --from-imports -o speck_weg\ui\dialog_user_ui.py speck_weg\ui\dialog_user.ui
 
 :: PAUSE
