@@ -5,7 +5,7 @@
 
 from sqlalchemy import (MetaData, Table, Column,
                         Integer, String, DateTime, Float,
-                        ForeignKey, UniqueConstraint)
+                        ForeignKey, UniqueConstraint, text)
 from sqlalchemy.sql import func
 
 metadata = MetaData(naming_convention={
@@ -45,9 +45,24 @@ tex_table = Table(
     'training_exercise', metadata,
     Column('tex_id', Integer, primary_key=True, autoincrement='auto'),
     # Column('tex_tpr_id', ForeignKey('training_program.tpr_id')),
+    Column('tex_usr_id', Integer, ForeignKey('user.usr_id'), nullable=True),
+    # tex_usr_id is referenced, if the body weight is relevant
     Column('name', String(63), nullable=False),
     Column('description', String(1023), nullable=True),
-    Column('sequence', Integer, nullable=True),
+    Column('sequence', Integer, nullable=False,
+           # Default value not possible: many2many relation
+           # it is required to know, for which program the new exercise is created
+           # server_default=text(
+           # )
+           # default=select(
+           #     func.max(tex_table.sequence)).join(
+           #      TrainingExercise.training_programs).where(
+           #      TrainingProgram.tpr_id == tpr.tpr_id
+           # )
+           ),
+    Column('baseline_repetitions', Integer, nullable=False),
+    Column('baseline_weight', Float, nullable=True),
+    Column('baseline_duration', Float, nullable=True),
     # Todo: Unique constraint tex_name + tex_tpl_id
 )
 

@@ -28,7 +28,8 @@ class TrainingProgram(Base):
     # orm definitions
     training_theme = relationship('TrainingTheme', back_populates='training_programs')
     training_exercises = relationship('TrainingExercise', secondary=tpr_tex_table,
-                                      back_populates='training_programs')
+                                      back_populates='training_programs',
+                                      order_by='TrainingExercise.sequence')
     workout_sessions = relationship('WorkoutSession', back_populates='training_program')
 
     def __repr__(self):

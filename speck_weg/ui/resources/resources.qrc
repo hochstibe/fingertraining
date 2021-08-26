@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="icons">
+    <file>pencil-alt-solid.svg</file>
     <file>arrow-left-solid.svg</file>
     <file>arrow-right-solid.svg</file>
     <file>arrow-up-solid.svg</file>

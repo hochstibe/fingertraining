@@ -6,9 +6,9 @@
 from typing import TYPE_CHECKING
 import PyQt5.QtCore
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
-from sqlalchemy import select
+from sqlalchemy import select, func
 
-from . import ThemeDialog, PlanDialog, ExerciseDialog, WorkoutDialog, UserDialog
+from . import ThemeDialog, ProgramDialog, ExerciseDialog, WorkoutDialog, UserDialog
 from .main_window_ui import Ui_MainWindow_training
 from ..models import TrainingTheme, TrainingProgram, TrainingExercise, User
 from ..tables import tpr_tex_table
@@ -48,6 +48,7 @@ class MainWindow(QMainWindow, Ui_MainWindow_training):
         self.listWidget_program.clicked.connect(self.program_list_clicked)
         self.pushButton_add_program.clicked.connect(self.new_program)
         self.pushButton_remove_program.clicked.connect(self.delete_program)
+        self.pushButton_edit_program.clicked.connect(self.edit_program)
         # Exercise
         self.listWidget_exercise.clicked.connect(self.exercise_list_clicked)
         self.pushButton_add_exercise.clicked.connect(self.new_exercise)
@@ -109,10 +110,10 @@ class MainWindow(QMainWindow, Ui_MainWindow_training):
 
         if theme:
             tth = theme.data(user_role)
-            # read all plans from db related to the program
-            programs = self.db.read(TrainingProgram, TrainingProgram.tpr_tth_id, tth.tth_id)
+            # read all programs from db related to the theme
+            # programs = self.db.read(TrainingProgram, TrainingProgram.tpr_tth_id, tth.tth_id)
 
-            for i, tpr in enumerate(programs):
+            for i, tpr in enumerate(tth.training_programs):
                 self.listWidget_program.insertItem(i, tpr.name)
                 self.listWidget_program.item(i).setData(user_role, tpr)
 
@@ -126,7 +127,20 @@ class MainWindow(QMainWindow, Ui_MainWindow_training):
         theme = self.listWidget_theme.currentItem()
 
         if theme:
-            dialog = PlanDialog(parent=self, db=self.db, parent_tth=theme.data(user_role))
+            dialog = ProgramDialog(parent=self, db=self.db, parent_tth=theme.data(user_role))
+            dialog.exec()
+
+            # rejected handles escape-key, x and the close button (connected to reject()
+            if dialog.rejected:
+                self.refresh_program_list()
+
+    def edit_program(self):
+        theme = self.listWidget_theme.currentItem()
+        program = self.listWidget_program.currentItem()
+
+        if program:
+            dialog = ProgramDialog(parent=self, db=self.db,
+                                   obj=program.data(user_role), parent_tth=theme.data(user_role))
             dialog.exec()
 
             # rejected handles escape-key, x and the close button (connected to reject()
@@ -160,14 +174,8 @@ class MainWindow(QMainWindow, Ui_MainWindow_training):
         if program:
             print('refresh exercises for the selected program', program.text())
             tpr = program.data(user_role)
-            # read all plans from db related to the program
-            stmt = select(
-                TrainingExercise).join(
-                TrainingExercise.training_programs).where(
-                TrainingProgram.tpr_id == tpr.tpr_id)
-            exercises = self.db.read_stmt(stmt)
 
-            for i, tex in enumerate(exercises):
+            for i, tex in enumerate(tpr.training_exercises):
                 self.listWidget_exercise.insertItem(i, tex.name)
                 self.listWidget_exercise.item(i).setData(user_role, tex)
         print('refresh done')
@@ -182,12 +190,28 @@ class MainWindow(QMainWindow, Ui_MainWindow_training):
 
         if program:
             print('opening dialog')
-            dialog = ExerciseDialog(parent=self, db=self.db, parent_tpr=program.data(user_role))
+            dialog = ExerciseDialog(parent=self, db=self.db, parent_tpr=program.data(user_role),
+                                    usr=self.usr)
             dialog.exec()
 
             # rejected handles escape-key, x and the close button (connected to reject()
             if dialog.rejected:
                 self.refresh_exercise_list()
+
+    def edit_exercise(self):
+        program = self.listWidget_program.currentItem()
+        exercise = self.listWidget_exercise.currentItem()
+
+        if exercise:
+            dialog = ExerciseDialog(parent=self, db=self.db,
+                                    obj=exercise.data(user_role),
+                                    parent_tpr=program.data(user_role),
+                                    usr=self.usr)
+            dialog.exec()
+
+            # rejected handles escape-key, x and the close button (connected to reject()
+            if dialog.rejected:
+                self.refresh_program_list()
 
     def delete_exercise(self):
         print('deleting exercise')

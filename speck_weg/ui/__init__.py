@@ -4,9 +4,9 @@
 #
 
 from .dialog_training_theme import ThemeDialog
-from .dialog_training_program import PlanDialog
+from .dialog_training_program import ProgramDialog
 from .dialog_training_exercise import ExerciseDialog
 from .dialog_workout import WorkoutDialog
 from .dialog_user import UserDialog
 
-__all__ = ['ThemeDialog', 'PlanDialog', 'ExerciseDialog', 'WorkoutDialog', 'UserDialog']
+__all__ = ['ThemeDialog', 'ProgramDialog', 'ExerciseDialog', 'WorkoutDialog', 'UserDialog']
