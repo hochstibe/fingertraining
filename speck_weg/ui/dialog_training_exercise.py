@@ -11,6 +11,7 @@ import PyQt5.QtCore
 
 from ..models import TrainingExercise
 from .dialog_training_exercise_ui import Ui_Dialog_training_exercise
+from .dialog_training_exercise_load import ExerciseLoadDialog
 
 if TYPE_CHECKING:
     from ..db import CRUD
@@ -39,22 +40,23 @@ class ExerciseDialog(QDialog, Ui_Dialog_training_exercise):
         self.setupUi(self)
         self.connect()
 
-        # previous / next not ready yet
-        self.pushButton_next.setEnabled(False)
-        self.pushButton_previous.setEnabled(False)
-
         if self.tex:
             self.lineEdit_name.setText(self.tex.name)
             self.lineEdit_description.setText(self.tex.description)
-            self.spinBox_repetitions.setValue(self.tex.repetitions)
+            self.spinBox_repetitions.setValue(self.tex.baseline_repetitions)
 
-            if self.tex.weight:
-                if self.tex.tex_usr_id:
-                    self.doubleSpinBox_weight.setValue(self.usr.weight)
-                else:
-                    self.doubleSpinBox_weight.setValue(self.tex.weight)
-            if self.tex.duration:
-                self.doubleSpinBox_duration.setValue(self.tex.duration)
+            self.checkBox_weight.setChecked(False)
+            self.checkBox_body_weight.setChecked(False)
+            if self.tex.baseline_weight:
+                self.checkBox_weight.setChecked(True)
+                self.doubleSpinBox_weight.setValue(self.tex.baseline_weight)
+            if self.tex.tex_usr_id:
+                self.checkBox_weight.setChecked(True)
+                self.checkBox_body_weight.setChecked(True)
+                self.doubleSpinBox_weight.setValue(self.usr.weight)
+            if self.tex.baseline_duration:
+                self.checkBox_duration.setChecked(True)
+                self.doubleSpinBox_duration.setValue(self.tex.baseline_duration)
         #     print('edit mode')
         #     self.set_edit_mode()
         #     # self.sequence = self.tex.sequence
@@ -75,9 +77,25 @@ class ExerciseDialog(QDialog, Ui_Dialog_training_exercise):
         Connect all signals to their slots
         """
         # The signal from cancel is already connected to reject() from the dialog
+        self.pushButton_import.clicked.connect(self.import_exercise)
         self.pushButton_save.clicked.connect(self.save)
-        self.pushButton_previous.clicked.connect(self.previous_exercise)
-        self.pushButton_next.clicked.connect(self.next_exercise)
+        self.checkBox_weight.clicked.connect(self.weight_clicked)
+        self.checkBox_body_weight.clicked.connect(self.body_weight_clicked)
+        self.checkBox_duration.clicked.connect(self.duration_clicked)
+
+    def import_exercise(self):
+        print('import exercise')
+        try:
+            dialog = ExerciseLoadDialog(parent=self, db=self.db,
+                                        parent_tpr=self.parent_tpr, usr=self.usr)
+            dialog.exec()
+
+            # rejected handles escape-key, x and the close button (connected to reject()
+            if dialog.rejected:
+                print('closing import dialog, nothing saved')
+        except Exception as exc:
+            print(exc)
+            raise
 
     def save(self):
         # Return the object, add to the db from main window
@@ -118,11 +136,39 @@ class ExerciseDialog(QDialog, Ui_Dialog_training_exercise):
         self.lineEdit_name.setFocus()
         self.tex = None
 
-    def previous_exercise(self):
-        pass
+    def weight_clicked(self, weight: float = None):
+        if weight:
+            self.doubleSpinBox_weight.setValue(weight)
 
-    def next_exercise(self):
-        pass
+        if self.checkBox_weight.isChecked():
+            self.checkBox_body_weight.setEnabled(True)
+            self.doubleSpinBox_weight.setEnabled(True)
+        else:
+            self.doubleSpinBox_weight.clear()
+            self.doubleSpinBox_weight.setEnabled(False)
+            self.checkBox_body_weight.setEnabled(False)
+
+    def body_weight_clicked(self, weight: float = None):
+        if weight:
+            self.doubleSpinBox_weight.setValue(weight)
+
+        if self.checkBox_body_weight.isChecked():
+            self.doubleSpinBox_weight.setValue(self.usr.weight)
+            self.doubleSpinBox_weight.setEnabled(False)
+        else:
+            # weight check box is checked, if body weight is clickable
+            self.doubleSpinBox_weight.clear()
+            self.doubleSpinBox_weight.setEnabled(True)
+
+    def duration_clicked(self, duration: float = None):
+        if duration:
+            self.doubleSpinBox_duration.setValue(duration)
+
+        if self.checkBox_duration.isChecked():
+            self.doubleSpinBox_duration.setEnabled(True)
+        else:
+            self.doubleSpinBox_duration.clear()
+            self.doubleSpinBox_duration.setEnabled(False)
 
     def update_object(self):
         if self.tex:
@@ -142,15 +188,3 @@ class ExerciseDialog(QDialog, Ui_Dialog_training_exercise):
                 self.tex.baseline_duration = self.doubleSpinBox_duration.value()
         else:
             raise ValueError('No Training program object for updating.')
-
-    def set_edit_mode(self):
-        # self.pushButton_save.setEnabled(False)
-        # self.pushButton_apply.setEnabled(True)
-        # self.pushButton_apply.setDefault(True)
-        pass
-
-    def set_new_mode(self):
-        # self.pushButton_apply.setEnabled(False)
-        # self.pushButton_save.setEnabled(True)
-        # self.pushButton_save.setDefault(True)
-        pass

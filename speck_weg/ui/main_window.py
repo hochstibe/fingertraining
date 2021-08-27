@@ -2,7 +2,7 @@
 # Stefan Hochuli, 20.07.2021,
 # Folder: speck_weg/ui File: main_window.py
 #
-
+import traceback
 from typing import TYPE_CHECKING
 import PyQt5.QtCore
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
@@ -50,9 +50,10 @@ class MainWindow(QMainWindow, Ui_MainWindow_training):
         self.pushButton_remove_program.clicked.connect(self.delete_program)
         self.pushButton_edit_program.clicked.connect(self.edit_program)
         # Exercise
-        self.listWidget_exercise.clicked.connect(self.exercise_list_clicked)
+        # self.listWidget_exercise.clicked.connect(self.exercise_list_clicked)
         self.pushButton_add_exercise.clicked.connect(self.new_exercise)
         self.pushButton_remove_exercise.clicked.connect(self.delete_exercise)
+        self.pushButton_edit_exercise.clicked.connect(self.edit_exercise)
 
         # Actions: User, Workout
         self.action_user_info.triggered.connect(self.edit_user)
@@ -180,9 +181,9 @@ class MainWindow(QMainWindow, Ui_MainWindow_training):
                 self.listWidget_exercise.item(i).setData(user_role, tex)
         print('refresh done')
 
-    def exercise_list_clicked(self):
-        item = self.listWidget_exercise.currentItem()
-        print('Clicked on the exercise', item.text())
+    # def exercise_list_clicked(self):
+    #     item = self.listWidget_exercise.currentItem()
+    #     print('Clicked on the exercise', item.text())
 
     def new_exercise(self):
         print('new exercise')
@@ -203,11 +204,19 @@ class MainWindow(QMainWindow, Ui_MainWindow_training):
         exercise = self.listWidget_exercise.currentItem()
 
         if exercise:
-            dialog = ExerciseDialog(parent=self, db=self.db,
-                                    obj=exercise.data(user_role),
-                                    parent_tpr=program.data(user_role),
-                                    usr=self.usr)
-            dialog.exec()
+            print('exercise selected')
+            try:
+                dialog = ExerciseDialog(parent=self, db=self.db,
+                                        obj=exercise.data(user_role),
+                                        parent_tpr=program.data(user_role),
+                                        usr=self.usr)
+                print('starting dialog')
+                dialog.exec()
+            except Exception as exc:
+                print(exc)
+                print(traceback.print_exc(exc))
+                traceback.print_exc(exc)
+                raise
 
             # rejected handles escape-key, x and the close button (connected to reject()
             if dialog.rejected:

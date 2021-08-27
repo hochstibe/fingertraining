@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>484</width>
-    <height>273</height>
+    <width>464</width>
+    <height>282</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -178,69 +178,10 @@
      <property name="sizeHint" stdset="0">
       <size>
        <width>17</width>
-       <height>29</height>
+       <height>70</height>
       </size>
      </property>
     </spacer>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_4">
-     <item>
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_previous">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="resources/resources.qrc">
-         <normaloff>:/icons/arrow-left-solid.svg</normaloff>:/icons/arrow-left-solid.svg</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_save">
-       <property name="text">
-        <string>&amp;Speichern</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_next">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="resources/resources.qrc">
-         <normaloff>:/icons/arrow-right-solid.svg</normaloff>:/icons/arrow-right-solid.svg</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_3">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -256,6 +197,23 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_import">
+       <property name="toolTip">
+        <string>Eine bestehende Übung verwenden.</string>
+       </property>
+       <property name="text">
+        <string>&amp;Importieren</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_save">
+       <property name="text">
+        <string>&amp;Speichern</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="pushButton_close">
@@ -279,8 +237,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>356</x>
-     <y>134</y>
+     <x>453</x>
+     <y>271</y>
     </hint>
     <hint type="destinationlabel">
      <x>180</x>
