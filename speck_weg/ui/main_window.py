@@ -2,16 +2,14 @@
 # Stefan Hochuli, 20.07.2021,
 # Folder: speck_weg/ui File: main_window.py
 #
-import traceback
+
 from typing import TYPE_CHECKING
 import PyQt5.QtCore
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
-from sqlalchemy import select, func
 
 from . import ThemeDialog, ProgramDialog, ExerciseDialog, WorkoutDialog, UserDialog
 from .main_window_ui import Ui_MainWindow_training
-from ..models import TrainingTheme, TrainingProgram, TrainingExercise, User
-from ..tables import tpr_tex_table
+from ..models import TrainingTheme, User
 
 if TYPE_CHECKING:
     from ..db import CRUD
@@ -107,8 +105,6 @@ class MainWindow(QMainWindow, Ui_MainWindow_training):
         # selected theme
         theme = self.listWidget_theme.currentItem()
 
-        # Todo: maybe simpler: use the tpr object in the listWidget
-
         if theme:
             tth = theme.data(user_role)
             # read all programs from db related to the theme
@@ -170,20 +166,14 @@ class MainWindow(QMainWindow, Ui_MainWindow_training):
         # selected plan
         program = self.listWidget_program.currentItem()
 
-        # Todo: maybe simpler: use the tpr object in the listWidget
-
         if program:
             print('refresh exercises for the selected program', program.text())
             tpr = program.data(user_role)
 
-            for i, tex in enumerate(tpr.training_exercises):
-                self.listWidget_exercise.insertItem(i, tex.name)
-                self.listWidget_exercise.item(i).setData(user_role, tex)
-        print('refresh done')
-
-    # def exercise_list_clicked(self):
-    #     item = self.listWidget_exercise.currentItem()
-    #     print('Clicked on the exercise', item.text())
+            for i, tpe in enumerate(tpr.training_exercises):
+                self.listWidget_exercise.insertItem(i, tpe.training_exercise.name)
+                self.listWidget_exercise.item(i).setData(user_role, tpe.training_exercise)
+            print('refresh done')
 
     def new_exercise(self):
         print('new exercise')
@@ -205,18 +195,12 @@ class MainWindow(QMainWindow, Ui_MainWindow_training):
 
         if exercise:
             print('exercise selected')
-            try:
-                dialog = ExerciseDialog(parent=self, db=self.db,
-                                        obj=exercise.data(user_role),
-                                        parent_tpr=program.data(user_role),
-                                        usr=self.usr)
-                print('starting dialog')
-                dialog.exec()
-            except Exception as exc:
-                print(exc)
-                print(traceback.print_exc(exc))
-                traceback.print_exc(exc)
-                raise
+            dialog = ExerciseDialog(parent=self, db=self.db,
+                                    obj=exercise.data(user_role),
+                                    parent_tpr=program.data(user_role),
+                                    usr=self.usr)
+            print('starting dialog')
+            dialog.exec()
 
             # rejected handles escape-key, x and the close button (connected to reject()
             if dialog.rejected:
@@ -278,7 +262,8 @@ class MainWindow(QMainWindow, Ui_MainWindow_training):
         msg.setIcon(QMessageBox.Information)
         msg.setWindowTitle('Speck Weg!')
         msg.setText(f'Speck Weg! Version {0.1}')
-        msg.setInformativeText('Stefan Hochuli, Copyright 2021')
+        msg.setInformativeText('Stefan Hochuli, Copyright 2021\n'
+                               'Icons von https://fontawesome.com/')
         msg.setStandardButtons(QMessageBox.Close)
 
         msg.exec()

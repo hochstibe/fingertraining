@@ -35,12 +35,6 @@ tpr_table = Table(
     # Todo: Unique constraint tpl_name + tpl_tpr_id
 )
 
-tpr_tex_table = Table(
-    'training_program_exercise', metadata,
-    Column('tpe_tpr_id', ForeignKey('training_program.tpr_id'), primary_key=True, nullable=False),
-    Column('tpe_tex_id', ForeignKey('training_exercise.tex_id'), primary_key=True, nullable=False),
-)
-
 tex_table = Table(
     'training_exercise', metadata,
     Column('tex_id', Integer, primary_key=True, autoincrement='auto'),
@@ -49,21 +43,17 @@ tex_table = Table(
     # tex_usr_id is referenced, if the body weight is relevant
     Column('name', String(63), nullable=False),
     Column('description', String(1023), nullable=True),
-    Column('sequence', Integer, nullable=False,
-           # Default value not possible: many2many relation
-           # it is required to know, for which program the new exercise is created
-           # server_default=text(
-           # )
-           # default=select(
-           #     func.max(tex_table.sequence)).join(
-           #      TrainingExercise.training_programs).where(
-           #      TrainingProgram.tpr_id == tpr.tpr_id
-           # )
-           ),
     Column('baseline_repetitions', Integer, nullable=False),
     Column('baseline_weight', Float, nullable=True),
     Column('baseline_duration', Float, nullable=True),
     # Todo: Unique constraint tex_name + tex_tpl_id
+)
+
+tpr_tex_table = Table(
+    'training_program_exercise', metadata,
+    Column('tpe_tpr_id', ForeignKey('training_program.tpr_id'), primary_key=True, nullable=False),
+    Column('tpe_tex_id', ForeignKey('training_exercise.tex_id'), primary_key=True, nullable=False),
+    Column('sequence', Integer, nullable=False),
 )
 
 wse_table = Table(

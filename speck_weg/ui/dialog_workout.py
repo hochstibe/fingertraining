@@ -3,9 +3,7 @@
 # Folder: speck_weg/ui File: dialog_workout.py
 #
 
-
 from typing import List, Optional, Union, TYPE_CHECKING
-from datetime import datetime
 
 from PyQt5.QtWidgets import QDialog, QMessageBox
 
@@ -48,7 +46,6 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
 
             msg.exec()
 
-
         # List of [index, planned exercise, logged exercise
         self.exercises: List[List['TrainingExercise', Optional[WorkoutExercise]]] = []
         self.current_pos: int = -1
@@ -56,9 +53,10 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
         # Add the form layout to a frame (
 
         if self.wse:
-            self.set_edit_mode()
+            # edit mode
+            pass
         else:
-            self.set_new_mode()
+            # new mode
             self.wse = WorkoutSession(wse_tpr_id=self.parent_tpr.tpr_id)
             # Commit the workout session with the first exercise
             self.db.create(self.wse)
@@ -255,15 +253,3 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
         else:
             print('out of range', self.current_pos, len(self.exercises))
             return None
-
-    def set_edit_mode(self):
-        # self.pushButton_save.setEnabled(False)
-        # self.pushButton_apply.setEnabled(True)
-        # self.pushButton_apply.setDefault(True)
-        pass
-
-    def set_new_mode(self):
-        # self.pushButton_apply.setEnabled(False)
-        # self.pushButton_save.setEnabled(True)
-        # self.pushButton_save.setDefault(True)
-        pass

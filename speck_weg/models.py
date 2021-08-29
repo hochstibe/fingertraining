@@ -27,9 +27,8 @@ class TrainingProgram(Base):
 
     # orm definitions
     training_theme = relationship('TrainingTheme', back_populates='training_programs')
-    training_exercises = relationship('TrainingExercise', secondary=tpr_tex_table,
-                                      back_populates='training_programs',
-                                      order_by='TrainingExercise.sequence')
+    training_exercises = relationship('TrainingProgramExercise', back_populates='training_program',
+                                      order_by='asc(TrainingProgramExercise.sequence)')
     workout_sessions = relationship('WorkoutSession', back_populates='training_program')
 
     def __repr__(self):
@@ -42,13 +41,22 @@ class TrainingExercise(Base):
     __table__ = tex_table
 
     # orm definitions
-    training_programs = relationship('TrainingProgram', secondary=tpr_tex_table,
-                                     back_populates='training_exercises')
+    training_programs = relationship('TrainingProgramExercise', back_populates='training_exercise')
     workout_exercises = relationship('WorkoutExercise', back_populates='training_exercise')
 
     def __repr__(self):
         return f'TrainingExercise(' \
                f'tex_id={self.tex_id!r}, name={self.name!r})'
+
+
+class TrainingProgramExercise(Base):
+    # table definitions
+    __table__ = tpr_tex_table
+
+    # orm definitions
+    training_program = relationship('TrainingProgram', back_populates='training_exercises')
+    training_exercise = relationship('TrainingExercise', back_populates='training_programs',)
+
 
 
 class WorkoutSession(Base):

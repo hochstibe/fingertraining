@@ -85,9 +85,9 @@ class ProgramDialog(QDialog, Ui_Dialog_training_program):
             self.lineEdit_name.setFocus()
 
     def refresh_exercise_list(self):
-        for i, tex in enumerate(self.tpr.training_exercises):
-            self.listWidget_exercise.insertItem(i, tex.name)
-            self.listWidget_exercise.item(i).setData(user_role, tex)
+        for i, tpe in enumerate(self.tpr.training_exercises):
+            self.listWidget_exercise.insertItem(i, tpe.training_exercise.name)
+            self.listWidget_exercise.item(i).setData(user_role, tpe.training_exercise)
 
     def one_up(self):
         row = self.listWidget_exercise.currentRow()
@@ -108,17 +108,11 @@ class ProgramDialog(QDialog, Ui_Dialog_training_program):
 
             for i in range(self.listWidget_exercise.count()):
                 tex = self.listWidget_exercise.item(i).data(user_role)
-                tex.sequence = i + 1
+                # select the association object to the tex
+                tpe = [
+                    tpe for tpe in self.tpr.training_exercises if tpe.tpe_tex_id == tex.tex_id
+                ][0]
+                tpe.sequence = i + 1
 
         else:
             raise ValueError('No Training program object for updating.')
-
-    # def set_edit_mode(self):
-    #     self.pushButton_save.setEnabled(False)
-    #     self.pushButton_apply.setEnabled(True)
-    #     self.pushButton_apply.setDefault(True)
-
-    # def set_new_mode(self):
-    #     self.pushButton_apply.setEnabled(False)
-    #     self.pushButton_save.setEnabled(True)
-    #     self.pushButton_save.setDefault(True)

@@ -3,14 +3,14 @@
 # Folder: speck_weg/ui File: dialog_training_exercise_load.py
 #
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from PyQt5.QtWidgets import QDialog
 import PyQt5.QtCore
 
 from sqlalchemy import select
 
-from ..models import TrainingExercise
+from ..models import TrainingExercise, TrainingProgramExercise
 from .dialog_training_exercise_load_ui import Ui_Dialog_training_exercise_load
 
 if TYPE_CHECKING:
@@ -96,7 +96,11 @@ class ExerciseLoadDialog(QDialog, Ui_Dialog_training_exercise_load):
             # Todo: change datamodel: exercise sequence is screwed if the exercise is used multiple times. Add the sequence to the relation table
             # Add the a new relation
             try:
-                self.parent_tpr.training_exercises.append(exercise.data(user_role))
+                max_sequence = max([tpr.sequence for tpr in self.parent_tpr.training_exercises])
+                tpe = TrainingProgramExercise(sequence=max_sequence + 1)
+                tpe.training_exercise = exercise.data(user_role)
+                tpe.training_program = self.parent_tpr
+                # self.parent_tpr.training_exercises.append(exercise.data(user_role))
                 self.db.update()
             except Exception as exc:
                 print(exc)

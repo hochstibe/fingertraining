@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Optional
 from PyQt5.QtWidgets import QDialog
 import PyQt5.QtCore
 
-from ..models import TrainingExercise
+from ..models import TrainingExercise, TrainingProgramExercise
 from .dialog_training_exercise_ui import Ui_Dialog_training_exercise
 from .dialog_training_exercise_load import ExerciseLoadDialog
 
@@ -68,7 +68,7 @@ class ExerciseDialog(QDialog, Ui_Dialog_training_exercise):
     @property
     def max_sequence(self) -> int:
         if self.parent_tpr.training_exercises:
-            return max([tex.sequence for tex in self.parent_tpr.training_exercises])
+            return max([tpr.sequence for tpr in self.parent_tpr.training_exercises])
         else:
             return 0
 
@@ -118,8 +118,13 @@ class ExerciseDialog(QDialog, Ui_Dialog_training_exercise):
 
                 self.update_object()
 
-                self.tex.sequence = self.max_sequence + 1
-                self.tex.training_programs.append(self.parent_tpr)
+                # Association with the sequence
+                tpr_tex = TrainingProgramExercise(sequence=self.max_sequence + 1)
+                tpr_tex.training_exercise = self.tex
+                tpr_tex.training_program = self.parent_tpr
+
+                # self.tex.sequence = self.max_sequence + 1
+                # self.tex.training_programs.append(self.parent_tpr)
 
                 self.db.create(self.tex)
                 print('tex added to the database')
