@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>729</width>
-    <height>366</height>
+    <width>613</width>
+    <height>552</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -89,7 +89,11 @@
        </layout>
       </item>
       <item>
-       <widget class="QListWidget" name="listWidget_theme"/>
+       <widget class="QListWidget" name="listWidget_theme">
+        <property name="dragDropMode">
+         <enum>QAbstractItemView::InternalMove</enum>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -166,7 +170,11 @@
        </layout>
       </item>
       <item>
-       <widget class="QListWidget" name="listWidget_program"/>
+       <widget class="QListWidget" name="listWidget_program">
+        <property name="dragDropMode">
+         <enum>QAbstractItemView::InternalMove</enum>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -237,7 +245,11 @@
        </layout>
       </item>
       <item>
-       <widget class="QListWidget" name="listWidget_exercise"/>
+       <widget class="QListWidget" name="listWidget_exercise">
+        <property name="dragDropMode">
+         <enum>QAbstractItemView::InternalMove</enum>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -248,7 +260,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>729</width>
+     <width>613</width>
      <height>22</height>
     </rect>
    </property>

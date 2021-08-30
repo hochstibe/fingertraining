@@ -4,7 +4,7 @@
 #
 
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from PyQt5.QtWidgets import QDialog
 import PyQt5.QtCore
@@ -22,29 +22,29 @@ user_role = PyQt5.QtCore.Qt.UserRole
 
 class ProgramDialog(QDialog, Ui_Dialog_training_program):
 
-    tpr: 'TrainingProgram' = None
-
     def __init__(self, db: 'CRUD', parent=None,
                  obj: 'TrainingProgram' = None, parent_tth: 'TrainingTheme' = None):
         super().__init__(parent)
 
         self.db = db
 
-        self.tpr = obj
-        self.parent_tth = parent_tth
+        self.tpr: Optional['TrainingProgram'] = obj
+        self.parent_tth: 'TrainingTheme' = parent_tth
 
         self.setupUi(self)
         self.connect()
 
-        # if self.tpr:
-        #     self.set_edit_mode()
-        # else:
-        #     self.set_new_mode()
-
         if self.tpr:
+            # editing
             self.lineEdit_name.setText(self.tpr.name)
-            self.lineEdit_description.setText(self.tpr.description)
-        self.refresh_exercise_list()
+            self.textEdit_description.setText(self.tpr.description)
+
+    @property
+    def max_sequence(self) -> int:
+        if self.parent_tth.training_programs:
+            return max([tpr.sequence for tpr in self.parent_tth.training_programs])
+        else:
+            return 0
 
     def connect(self):
         """
@@ -52,8 +52,6 @@ class ProgramDialog(QDialog, Ui_Dialog_training_program):
         """
         # The signal from cancel is already connected to reject() from the dialog
         self.pushButton_save.clicked.connect(self.save)
-        self.pushButton_up.clicked.connect(self.one_up)
-        self.pushButton_down.clicked.connect(self.one_down)
 
     def save(self):
         # Return the object, add to the db from main window
@@ -70,49 +68,29 @@ class ProgramDialog(QDialog, Ui_Dialog_training_program):
             print('new program')
             self.tpr = TrainingProgram(
                 tpr_tth_id=self.parent_tth.tth_id,
+                sequence=self.max_sequence + 1
             )
-            #     name=self.lineEdit_name.text(),
-            #     description=self.lineEdit_description.text()
-            # )
+
             self.update_object()
             self.db.create(self.tpr)
             print('tpr added to the database')
 
             # Clear after saving for adding a new one
             self.lineEdit_name.clear()
-            self.lineEdit_description.clear()
+            self.textEdit_description.clear()
             # Reset the focus on the first lineEdit
             self.lineEdit_name.setFocus()
+            self.tpr = None
 
     def refresh_exercise_list(self):
         for i, tpe in enumerate(self.tpr.training_exercises):
             self.listWidget_exercise.insertItem(i, tpe.training_exercise.name)
             self.listWidget_exercise.item(i).setData(user_role, tpe.training_exercise)
 
-    def one_up(self):
-        row = self.listWidget_exercise.currentRow()
-        item = self.listWidget_exercise.takeItem(row)
-        self.listWidget_exercise.insertItem(row - 1, item)
-        self.listWidget_exercise.setCurrentRow(row - 1)
-
-    def one_down(self):
-        row = self.listWidget_exercise.currentRow()
-        item = self.listWidget_exercise.takeItem(row)
-        self.listWidget_exercise.insertItem(row + 1, item)
-        self.listWidget_exercise.setCurrentRow(row + 1)
-
     def update_object(self):
         if self.tpr:
             self.tpr.name = self.lineEdit_name.text()
-            self.tpr.description = self.lineEdit_description.text()
-
-            for i in range(self.listWidget_exercise.count()):
-                tex = self.listWidget_exercise.item(i).data(user_role)
-                # select the association object to the tex
-                tpe = [
-                    tpe for tpe in self.tpr.training_exercises if tpe.tpe_tex_id == tex.tex_id
-                ][0]
-                tpe.sequence = i + 1
+            self.tpr.description = self.textEdit_description.toPlainText()
 
         else:
             raise ValueError('No Training program object for updating.')

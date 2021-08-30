@@ -21,6 +21,7 @@ tth_table = Table(
     Column('tth_id', Integer, primary_key=True, autoincrement='auto'),
     Column('name', String(63), nullable=False),
     Column('description', String(1023), nullable=True),
+    Column('sequence', Integer, nullable=False),
 
     # Constraints
     UniqueConstraint('name'),
@@ -32,21 +33,25 @@ tpr_table = Table(
     Column('tpr_tth_id', ForeignKey('training_theme.tth_id'), nullable=False),
     Column('name', String(63), nullable=False),
     Column('description', String(1023), nullable=True),
-    # Todo: Unique constraint tpl_name + tpl_tpr_id
+    Column('sequence', Integer, nullable=False),
+
+    # Constraints
+    UniqueConstraint('tpr_tth_id', 'name'),
 )
 
 tex_table = Table(
     'training_exercise', metadata,
     Column('tex_id', Integer, primary_key=True, autoincrement='auto'),
-    # Column('tex_tpr_id', ForeignKey('training_program.tpr_id')),
-    Column('tex_usr_id', Integer, ForeignKey('user.usr_id'), nullable=True),
     # tex_usr_id is referenced, if the body weight is relevant
+    Column('tex_usr_id', Integer, ForeignKey('user.usr_id'), nullable=True),
     Column('name', String(63), nullable=False),
     Column('description', String(1023), nullable=True),
     Column('baseline_repetitions', Integer, nullable=False),
     Column('baseline_weight', Float, nullable=True),
     Column('baseline_duration', Float, nullable=True),
-    # Todo: Unique constraint tex_name + tex_tpl_id
+
+    # Constraints
+    # Multiple exercises with the same name possible (2x half crimp big)
 )
 
 tpr_tex_table = Table(
@@ -73,7 +78,6 @@ wex_table = Table(
     Column('repetitions', Integer, nullable=False),
     Column('weight', Float, nullable=True),
     Column('duration', Integer, nullable=True),
-    Column('ratio', Float, nullable=False),
     Column('comment', String(1023), nullable=True),
 )
 

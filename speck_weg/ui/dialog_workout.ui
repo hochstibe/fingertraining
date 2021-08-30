@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>441</width>
-    <height>465</height>
+    <height>393</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -101,32 +101,81 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QDoubleSpinBox" name="doubleSpinBox_weight">
-       <property name="toolTip">
-        <string>Gewicht in [kg] oder ein Verhältnis angeben.</string>
-       </property>
-       <property name="maximum">
-        <double>199.990000000000009</double>
-       </property>
-       <property name="value">
-        <double>1.000000000000000</double>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_weight">
+         <property name="toolTip">
+          <string>Gewicht in [kg] oder ein Verhältnis angeben.</string>
+         </property>
+         <property name="suffix">
+          <string> kg</string>
+         </property>
+         <property name="maximum">
+          <double>199.990000000000009</double>
+         </property>
+         <property name="value">
+          <double>42.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string> x </string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_ratio">
+         <property name="toolTip">
+          <string>Gewicht in [kg] oder ein Verhältnis angeben.</string>
+         </property>
+         <property name="minimum">
+          <double>0.010000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>10.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>0.100000000000000</double>
+         </property>
+         <property name="value">
+          <double>1.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
      </item>
      <item row="2" column="0">
-      <widget class="QLabel" name="label_ratio">
+      <widget class="QLabel" name="label_duration">
        <property name="text">
-        <string>Verhältnis</string>
+        <string>Dauer</string>
        </property>
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QDoubleSpinBox" name="doubleSpinBox_ratio">
+      <widget class="QDoubleSpinBox" name="doubleSpinBox_duration">
        <property name="toolTip">
-        <string>Gewicht in [kg] oder ein Verhältnis angeben.</string>
+        <string>Dauer der Übung [s]</string>
        </property>
-       <property name="maximum">
-        <double>9.990000000000000</double>
+       <property name="suffix">
+        <string> s</string>
+       </property>
+       <property name="value">
+        <double>7.000000000000000</double>
        </property>
       </widget>
      </item>

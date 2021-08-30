@@ -50,22 +50,6 @@
        <property name="text">
         <string>&amp;Beschreibung</string>
        </property>
-       <property name="buddy">
-        <cstring>lineEdit_description</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QLineEdit" name="lineEdit_description">
-       <property name="maxLength">
-        <number>1023</number>
-       </property>
-       <property name="placeholderText">
-        <string>Optionale Beschreibung</string>
-       </property>
-       <property name="clearButtonEnabled">
-        <bool>true</bool>
-       </property>
       </widget>
      </item>
      <item row="2" column="0">
@@ -108,10 +92,10 @@
        <item>
         <widget class="QCheckBox" name="checkBox_weight">
          <property name="text">
-          <string>Gewicht verwenden</string>
+          <string>Gewicht</string>
          </property>
          <property name="checked">
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -127,6 +111,9 @@
        </item>
        <item>
         <widget class="QDoubleSpinBox" name="doubleSpinBox_weight">
+         <property name="suffix">
+          <string> kg</string>
+         </property>
          <property name="maximum">
           <double>199.990000000000009</double>
          </property>
@@ -149,7 +136,7 @@
        <item>
         <widget class="QCheckBox" name="checkBox_duration">
          <property name="text">
-          <string>Dauer verwenden</string>
+          <string>Dauer</string>
          </property>
          <property name="checked">
           <bool>true</bool>
@@ -161,12 +148,22 @@
          <property name="toolTip">
           <string>Dauer der Übung [s]</string>
          </property>
+         <property name="suffix">
+          <string> s</string>
+         </property>
          <property name="value">
           <double>7.000000000000000</double>
          </property>
         </widget>
        </item>
       </layout>
+     </item>
+     <item row="1" column="1">
+      <widget class="QTextEdit" name="textEdit_description">
+       <property name="placeholderText">
+        <string>Optionale Beschreibung</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -212,6 +209,9 @@
       <widget class="QPushButton" name="pushButton_save">
        <property name="text">
         <string>&amp;Speichern</string>
+       </property>
+       <property name="default">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

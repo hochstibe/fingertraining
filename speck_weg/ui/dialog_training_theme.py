@@ -3,7 +3,7 @@
 # Folder: speck_weg/ui File: dialog_training_theme.py
 #
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from PyQt5.QtWidgets import QDialog
 
@@ -16,23 +16,23 @@ if TYPE_CHECKING:
 
 class ThemeDialog(QDialog, Ui_Dialog_training_theme):
 
-    tth: 'TrainingTheme' = None
-
-    def __init__(self, db: 'CRUD', parent=None, obj: 'TrainingTheme' = None):
+    def __init__(self, db: 'CRUD', parent=None, obj: 'TrainingTheme' = None,
+                 max_sequence=None):
         super().__init__(parent)
         print('init theme')
 
         self.db = db
 
-        self.tth = obj
+        self.tth: Optional['TrainingTheme'] = obj
+        self.max_sequence: int = max_sequence
 
         self.setupUi(self)
         self.connect()
 
         if self.tth:
-            self.set_edit_mode()
-        else:
-            self.set_new_mode()
+            # editing
+            self.lineEdit_name.setText(self.tth.name)
+            self.textEdit_description.setText(self.tth.description)
 
     def connect(self):
         """
@@ -42,26 +42,29 @@ class ThemeDialog(QDialog, Ui_Dialog_training_theme):
         self.pushButton_save.clicked.connect(self.save)
 
     def save(self):
-        # Return the object, add to the db from main window
-        self.tth = TrainingTheme(
-            name=self.lineEdit_name.text(),
-            description=self.lineEdit_description.text()
-        )
-        self.db.create(self.tth)
-        print('theme added to the database')
 
-        # Clear after saving for adding a new one
-        self.lineEdit_name.clear()
-        self.lineEdit_description.clear()
-        # Reset the focus on the first lineEdit
-        self.lineEdit_name.setFocus()
+        if self.tth:
+            # editing the existing object
+            self.tth.name = self.lineEdit_name.text()
+            self.tth.description = self.textEdit_description.toPlainText()
 
-    def set_edit_mode(self):
-        self.pushButton_save.setEnabled(False)
-        self.pushButton_apply.setEnabled(True)
-        self.pushButton_apply.setDefault(True)
+            self.db.update()
+            print('theme updated')
 
-    def set_new_mode(self):
-        self.pushButton_apply.setEnabled(False)
-        self.pushButton_save.setEnabled(True)
-        self.pushButton_save.setDefault(True)
+        else:
+            # Return the object, add to the db from main window
+            self.tth = TrainingTheme(
+                name=self.lineEdit_name.text(),
+                description=self.textEdit_description.toPlainText(),
+                sequence=self.max_sequence + 1,
+            )
+            self.db.create(self.tth)
+            self.max_sequence += 1
+            print('theme added to the database')
+
+            # Clear after saving for adding a new one
+            self.tth = None
+            self.lineEdit_name.clear()
+            self.textEdit_description.clear()
+            # Reset the focus on the first lineEdit
+            self.lineEdit_name.setFocus()

@@ -10,15 +10,15 @@
     <x>0</x>
     <y>0</y>
     <width>427</width>
-    <height>368</height>
+    <height>264</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Programm</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QGridLayout" name="gridLayout">
+    <layout class="QFormLayout" name="formLayout">
      <item row="0" column="0">
       <widget class="QLabel" name="label_name">
        <property name="text">
@@ -51,86 +51,16 @@
         <string>&amp;Beschreibung</string>
        </property>
        <property name="buddy">
-        <cstring>lineEdit_description</cstring>
+        <cstring>textEdit_description</cstring>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="lineEdit_description">
-       <property name="maxLength">
-        <number>1023</number>
-       </property>
+      <widget class="QTextEdit" name="textEdit_description">
        <property name="placeholderText">
         <string>Optionale Beschreibung</string>
        </property>
-       <property name="clearButtonEnabled">
-        <bool>true</bool>
-       </property>
       </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <widget class="Line" name="line">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Übungen</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QListWidget" name="listWidget_exercise">
-       <property name="dragDropMode">
-        <enum>QAbstractItemView::InternalMove</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <widget class="QPushButton" name="pushButton_up">
-         <property name="text">
-          <string/>
-         </property>
-         <property name="icon">
-          <iconset resource="resources/resources.qrc">
-           <normaloff>:/icons/arrow-up-solid.svg</normaloff>:/icons/arrow-up-solid.svg</iconset>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButton_down">
-         <property name="text">
-          <string/>
-         </property>
-         <property name="icon">
-          <iconset resource="resources/resources.qrc">
-           <normaloff>:/icons/arrow-down-solid.svg</normaloff>:/icons/arrow-down-solid.svg</iconset>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>28</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
      </item>
     </layout>
    </item>
@@ -163,16 +93,12 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_apply">
-       <property name="text">
-        <string>&amp;Ändern</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="pushButton_save">
        <property name="text">
         <string>&amp;Speichern</string>
+       </property>
+       <property name="default">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -198,8 +124,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>356</x>
-     <y>134</y>
+     <x>416</x>
+     <y>357</y>
     </hint>
     <hint type="destinationlabel">
      <x>180</x>

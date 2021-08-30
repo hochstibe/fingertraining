@@ -14,7 +14,9 @@ class TrainingTheme(Base):
     __table__ = tth_table
 
     # orm definitions
-    training_programs = relationship('TrainingProgram', back_populates='training_theme')
+    training_programs = relationship('TrainingProgram', back_populates='training_theme',
+                                     order_by='asc(TrainingProgram.sequence), '
+                                              'asc(TrainingProgram.name)')
 
     def __repr__(self):
         return f'TrainingTheme(' \
@@ -41,7 +43,8 @@ class TrainingExercise(Base):
     __table__ = tex_table
 
     # orm definitions
-    training_programs = relationship('TrainingProgramExercise', back_populates='training_exercise')
+    training_programs = relationship('TrainingProgramExercise', back_populates='training_exercise',
+                                     cascade="all, delete")
     workout_exercises = relationship('WorkoutExercise', back_populates='training_exercise')
 
     def __repr__(self):

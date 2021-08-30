@@ -93,7 +93,6 @@ class ExerciseLoadDialog(QDialog, Ui_Dialog_training_exercise_load):
         exercise = self.listWidget_exercise.currentItem()
 
         if exercise:
-            # Todo: change datamodel: exercise sequence is screwed if the exercise is used multiple times. Add the sequence to the relation table
             # Add the a new relation
             try:
                 max_sequence = max([tpr.sequence for tpr in self.parent_tpr.training_exercises])

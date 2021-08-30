@@ -11,7 +11,14 @@ from speck_weg.ui.main_window import MainWindow
 from speck_weg.db import CRUD
 
 
+def except_hook(cls, exception, traceback):
+    sys.__excepthook__(cls, exception, traceback)
+
+
 if __name__ == "__main__":
+
+    # tracebacks not printed if executed in ide
+    sys.excepthook = except_hook
 
     # Open db session
     db = CRUD()
