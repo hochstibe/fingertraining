@@ -9,7 +9,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 
-from .tables import metadata
+from .models import metadata
 
 if TYPE_CHECKING:
     from sqlalchemy import Column
