@@ -17,23 +17,20 @@ if TYPE_CHECKING:
 
 class WorkoutDialog(QDialog, Ui_Dialog_workout):
 
-    wse: 'WorkoutSession' = None
-    usr: 'User' = None
-
     def __init__(self, db: 'CRUD', parent=None,
                  obj: 'WorkoutSession' = None, parent_tpr: 'TrainingProgram' = None):
         super().__init__(parent)
 
         self.db = db
 
-        self.wse = obj
-        self.parent_tpr = parent_tpr
+        self.wse: Optional['WorkoutSession'] = obj
+        self.parent_tpr: 'TrainingProgram' = parent_tpr
 
         self.setupUi(self)
         self.connect()
 
         # Get the current user
-        self.usr = self.db.read_first(User)
+        self.usr: 'User' = self.db.read_first(User)
         if not self.usr:
 
             print('No program selected')
@@ -106,70 +103,41 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
 
     def save_exercise(self):
         # Return the object, add to the db from main window
-        try:
-            tex, wex = self.current_exercise
-            print('saving exercise')
+        tex, wex = self.current_exercise
+        print('saving exercise')
 
-            if wex:
-                print('  existing', wex)
-                # The exercise already exists in the database
-                wex.repetitions = self.spinBox_repetitions.value()
-                wex.weight = self.doubleSpinBox_weight.value()
-                wex.description = self.textEdit_comment.toPlainText()
+        if wex:
+            print('  existing', wex)
+            # The exercise already exists in the database
+            wex.repetitions = self.spinBox_repetitions.value()
+            wex.weight = self.doubleSpinBox_weight.value()
+            wex.description = self.textEdit_comment.toPlainText()
 
-                self.db.update()
+            self.db.update()
 
+        else:
+            if self.baseline_weight:
+                weight = self.doubleSpinBox_weight.value() * self.doubleSpinBox_ratio.value()
             else:
-                print('  new wex')
-                print('wse', self.wse.wse_id)
-                print('tex', tex.tex_id)
-                print(self.spinBox_repetitions.value())
-                print(self.doubleSpinBox_weight.value(), self.doubleSpinBox_ratio.value())
-                print('object:')
+                weight = None
+            if self.baseline_duration:
+                duration = self.doubleSpinBox_duration.value()
+            else:
+                duration = None
 
-                if self.baseline_weight:
-                    weight = self.doubleSpinBox_weight.value() * self.doubleSpinBox_ratio.value()
-                else:
-                    weight = None
-                if self.baseline_duration:
-                    duration = self.doubleSpinBox_duration.value()
-                else:
-                    duration = None
-                # if weight < 5:
-                #     # ratio given, not weight in kg
-                #     ratio = weight
-                #     weight = ratio * self.usr.weight
-                # else:
-                #     # kg given
-                #     ratio = weight / self.usr.weight
+            wex = WorkoutExercise(
+                wex_wse_id=self.wse.wse_id,
+                wex_tex_id=tex.tex_id,
+                repetitions=self.spinBox_repetitions.value(),
+                weight=weight,
+                duration=duration
+            )
+            print(' ', wex)
+            self.db.create(wex)
 
-                wex = WorkoutExercise(
-                    wex_wse_id=self.wse.wse_id,
-                    wex_tex_id=tex.tex_id,
-                    repetitions=self.spinBox_repetitions.value(),
-                    weight=weight,
-                    duration=duration
-                )
-                print(' ', wex)
-                self.db.create(wex)
-
-            # update-statement in the commit if wex already exists, else insert
-            # print('  committing', self.db.session.dirty, self.db.session.new)
-            # self.db.session.commit()
-            # print('tex added to the database')
-
-            # Add the tex to the wex
-            self.current_exercise[1] = wex
-            print(self.current_exercise)
-
-            # Clear after saving for adding a new one
-            # self.lineEdit_name.clear()
-            # self.lineEdit_description.clear()
-            # print('cleared')
-
-        except Exception as exc:
-            print(exc)
-            raise exc
+        # Add the tex to the wex
+        self.current_exercise[1] = wex
+        print(self.current_exercise)
 
     def previous_exercise(self):
         print('previous exercise')
@@ -187,17 +155,23 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
 
     def weight_changed(self):
         # weight was changed --> update the ratio
-        # self.doubleSpinBox_ratio.setValue(self.doubleSpinBox_weight.value() / self.usr.weight)
-        # recalculate the ratio if the weight is changed
-
         ratio = self.doubleSpinBox_weight.value() / self.baseline_weight
         self.doubleSpinBox_ratio.setValue(ratio)
 
     def ratio_changed(self):
         # ratio was changed --> update the weight
-
         weight = self.doubleSpinBox_ratio.value() * self.baseline_weight
         self.doubleSpinBox_weight.setValue(weight)
+
+    def update_dialog(self):
+        print('update dialog')
+        self.update_labels()
+        try:
+            if self.current_pos in range(0, len(self.exercises)):
+                self.set_values()
+        except Exception as exc:
+            print(exc)
+            raise
 
     def update_labels(self):
         print('update labels')
@@ -243,6 +217,7 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
             # Add the information from the current tex and wex
             print(' ', self.current_exercise)
             tex, wex = self.current_exercise
+
             # set default values for weight / duration
             if tex.baseline_weight:
                 self.baseline_weight = tex.baseline_weight
@@ -261,16 +236,6 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
                 self.doubleSpinBox_ratio.setEnabled(False)
             if not self.baseline_duration:
                 self.doubleSpinBox_duration.setEnabled(False)
-
-    def update_dialog(self):
-        print('update dialog')
-        self.update_labels()
-        try:
-            if self.current_pos in range(0, len(self.exercises)):
-                self.set_values()
-        except Exception as exc:
-            print(exc)
-            raise
 
     def set_values(self):
         print('set values')

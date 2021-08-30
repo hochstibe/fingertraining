@@ -104,8 +104,6 @@ class ExerciseDialog(QDialog, Ui_Dialog_training_exercise):
 
         else:
             print('new tex')
-
-
             self.tex = TrainingExercise()
 
             self.update_exercise_object()

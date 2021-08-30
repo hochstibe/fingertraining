@@ -67,4 +67,3 @@ class UserDialog(QDialog, Ui_Dialog_user):
     def update_labels(self):
         self.lineEdit_name.setText(self.usr.name)
         self.doubleSpinBox_weight.setValue(self.usr.weight)
-

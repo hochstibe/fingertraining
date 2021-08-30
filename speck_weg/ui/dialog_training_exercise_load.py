@@ -65,28 +65,25 @@ class ExerciseLoadDialog(QDialog, Ui_Dialog_training_exercise_load):
     def exercise_list_clicked(self):
         exercise = self.listWidget_exercise.currentItem()
         print('Clicked on the exercise list', exercise.text())
-        try:
-            tex = exercise.data(user_role)
 
-            self.lineEdit_name.setText(tex.name)
-            self.lineEdit_description.setText(tex.description)
-            self.spinBox_repetitions.setValue(tex.baseline_repetitions)
+        tex = exercise.data(user_role)
 
-            self.checkBox_weight.setChecked(False)
-            self.checkBox_body_weight.setChecked(False)
-            if tex.baseline_weight:
-                self.checkBox_weight.setChecked(True)
-                self.doubleSpinBox_weight.setValue(tex.baseline_weight)
-            if tex.tex_usr_id:
-                self.checkBox_weight.setChecked(True)
-                self.checkBox_body_weight.setChecked(True)
-                self.doubleSpinBox_weight.setValue(self.usr.weight)
-            if tex.baseline_duration:
-                self.checkBox_duration.setChecked(True)
-                self.doubleSpinBox_duration.setValue(tex.baseline_duration)
-        except Exception as exc:
-            print(exc)
-            raise
+        self.lineEdit_name.setText(tex.name)
+        self.lineEdit_description.setText(tex.description)
+        self.spinBox_repetitions.setValue(tex.baseline_repetitions)
+
+        self.checkBox_weight.setChecked(False)
+        self.checkBox_body_weight.setChecked(False)
+        if tex.baseline_weight:
+            self.checkBox_weight.setChecked(True)
+            self.doubleSpinBox_weight.setValue(tex.baseline_weight)
+        if tex.tex_usr_id:
+            self.checkBox_weight.setChecked(True)
+            self.checkBox_body_weight.setChecked(True)
+            self.doubleSpinBox_weight.setValue(self.usr.weight)
+        if tex.baseline_duration:
+            self.checkBox_duration.setChecked(True)
+            self.doubleSpinBox_duration.setValue(tex.baseline_duration)
 
     def import_exercise(self):
 
