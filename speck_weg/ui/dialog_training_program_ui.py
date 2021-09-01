@@ -33,6 +33,8 @@ class Ui_Dialog_training_program(object):
         self.label_description.setObjectName("label_description")
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.label_description)
         self.textEdit_description = QtWidgets.QTextEdit(Dialog_training_program)
+        self.textEdit_description.setMaximumSize(QtCore.QSize(16777215, 60))
+        self.textEdit_description.setTabChangesFocus(True)
         self.textEdit_description.setObjectName("textEdit_description")
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.textEdit_description)
         self.verticalLayout.addLayout(self.formLayout)

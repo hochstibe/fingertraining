@@ -79,6 +79,7 @@ class TrainingExercise(Base):
     tex_usr_id = Column(Integer, ForeignKey('user.usr_id'), nullable=True)
     name = Column(String(63), nullable=False)
     description = Column(String(1023), nullable=True)
+    baseline_sets = Column(Integer, nullable=False)
     baseline_repetitions = Column(Integer, nullable=False)
     baseline_weight = Column(Float, nullable=True)
     baseline_duration = Column(Float, nullable=True)
@@ -87,6 +88,7 @@ class TrainingExercise(Base):
     training_programs = relationship('TrainingProgramExercise', back_populates='training_exercise',
                                      cascade="all, delete")
     workout_exercises = relationship('WorkoutExercise', back_populates='training_exercise')
+    user = relationship('User', back_populates='training_exercises')
 
     def __repr__(self):
         return f'TrainingExercise(' \
@@ -99,7 +101,7 @@ class TrainingProgramExercise(Base):
 
     tpe_tpr_id = Column(ForeignKey('training_program.tpr_id'), primary_key=True, nullable=False)
     tpe_tex_id = Column(ForeignKey('training_exercise.tex_id'), primary_key=True, nullable=False)
-    sequence = Column(Integer, nullable=False)
+    sequence = Column(Integer, primary_key=True, nullable=False)
 
     # orm definitions
     training_program = relationship('TrainingProgram', back_populates='training_exercises')
@@ -122,7 +124,9 @@ class WorkoutSession(Base):
 
     # orm definitions
     training_program = relationship('TrainingProgram', back_populates='workout_sessions')
-    workout_exercises = relationship('WorkoutExercise', back_populates='workout_session')
+    workout_exercises = relationship('WorkoutExercise', back_populates='workout_session',
+                                     order_by='asc(WorkoutExercise.sequence), '
+                                              'asc(WorkoutExercise.set)')
 
     def __repr__(self):
         return f'WorkoutSession(' \
@@ -136,9 +140,11 @@ class WorkoutExercise(Base):
     wex_id = Column(Integer, primary_key=True, autoincrement='auto')
     wex_wse_id = Column(ForeignKey('workout_session.wse_id'))
     wex_tex_id = Column(ForeignKey('training_exercise.tex_id'))
+    sequence = Column(Integer, nullable=False)  # same sequence as in tpe for each exercise
+    set = Column(Integer, nullable=False)
     repetitions = Column(Integer, nullable=False)
     weight = Column(Float, nullable=True)
-    duration = Column(Integer, nullable=True)
+    duration = Column(Float, nullable=True)
     comment = Column(String(1023), nullable=True)
 
     # orm definitions
@@ -157,6 +163,8 @@ class User(Base):
     usr_id = Column(Integer, primary_key=True, autoincrement='auto')
     name = Column(String(255), nullable=False)
     weight = Column(Float, nullable=False)
+
+    training_exercises = relationship('TrainingExercise', back_populates='user')
 
     def __repr__(self):
         return f'User(usr_id={self.usr_id}, name={self.name} weight={self.weight}'

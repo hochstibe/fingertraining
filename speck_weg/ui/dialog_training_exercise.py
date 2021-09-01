@@ -40,6 +40,7 @@ class ExerciseDialog(QDialog, Ui_Dialog_training_exercise):
         if self.tex:
             self.lineEdit_name.setText(self.tex.name)
             self.textEdit_description.setText(self.tex.description)
+            self.spinBox_sets.setValue(self.tex.baseline_sets)
             self.spinBox_repetitions.setValue(self.tex.baseline_repetitions)
 
             if self.tex.baseline_weight:
@@ -163,6 +164,7 @@ class ExerciseDialog(QDialog, Ui_Dialog_training_exercise):
         if self.tex:
             self.tex.name = self.lineEdit_name.text()
             self.tex.description = self.textEdit_description.toPlainText()
+            self.tex.baseline_sets = self.spinBox_sets.value()
             self.tex.baseline_repetitions = self.spinBox_repetitions.value()
             if self.checkBox_weight.isChecked():
                 print('custom weight')

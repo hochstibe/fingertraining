@@ -32,8 +32,8 @@ class ExerciseLoadDialog(QDialog, Ui_Dialog_training_exercise_load):
 
         self.db = db
 
-        self.parent_tpr = parent_tpr
-        self.usr = usr
+        self.parent_tpr: 'TrainingProgram' = parent_tpr
+        self.usr: 'User' = usr
 
         self.setupUi(self)
         self.connect()
@@ -66,10 +66,11 @@ class ExerciseLoadDialog(QDialog, Ui_Dialog_training_exercise_load):
         exercise = self.listWidget_exercise.currentItem()
         print('Clicked on the exercise list', exercise.text())
 
-        tex = exercise.data(user_role)
+        tex: 'TrainingExercise' = exercise.data(user_role)
 
         self.lineEdit_name.setText(tex.name)
-        self.lineEdit_description.setText(tex.description)
+        self.textEdit_description.setText(tex.description)
+        self.spinBox_sets.setValue(tex.baseline_sets)
         self.spinBox_repetitions.setValue(tex.baseline_repetitions)
 
         self.checkBox_weight.setChecked(False)
@@ -92,7 +93,10 @@ class ExerciseLoadDialog(QDialog, Ui_Dialog_training_exercise_load):
         if exercise:
             # Add the a new relation
             try:
-                max_sequence = max([tpr.sequence for tpr in self.parent_tpr.training_exercises])
+                if self.parent_tpr.training_exercises:
+                    max_sequence = max([tpr.sequence for tpr in self.parent_tpr.training_exercises])
+                else:
+                    max_sequence = 0
                 tpe = TrainingProgramExercise(sequence=max_sequence + 1)
                 tpe.training_exercise = exercise.data(user_role)
                 tpe.training_program = self.parent_tpr
@@ -101,56 +105,3 @@ class ExerciseLoadDialog(QDialog, Ui_Dialog_training_exercise_load):
             except Exception as exc:
                 print(exc)
                 raise
-
-    def weight_clicked(self, weight: float = None):
-        if weight:
-            self.doubleSpinBox_weight.setValue(weight)
-
-        if self.checkBox_weight.isChecked():
-            self.checkBox_body_weight.setEnabled(True)
-            self.doubleSpinBox_weight.setEnabled(True)
-        else:
-            self.doubleSpinBox_weight.clear()
-            self.doubleSpinBox_weight.setEnabled(False)
-            self.checkBox_body_weight.setEnabled(False)
-
-    def body_weight_clicked(self, weight: float = None):
-        if weight:
-            self.doubleSpinBox_weight.setValue(weight)
-
-        if self.checkBox_body_weight.isChecked():
-            self.doubleSpinBox_weight.setValue(self.usr.weight)
-            self.doubleSpinBox_weight.setEnabled(False)
-        else:
-            # weight check box is checked, if body weight is clickable
-            self.doubleSpinBox_weight.clear()
-            self.doubleSpinBox_weight.setEnabled(True)
-
-    def duration_clicked(self, duration: float = None):
-        if duration:
-            self.doubleSpinBox_duration.setValue(duration)
-
-        if self.checkBox_duration.isChecked():
-            self.doubleSpinBox_duration.setEnabled(True)
-        else:
-            self.doubleSpinBox_duration.clear()
-            self.doubleSpinBox_duration.setEnabled(False)
-
-    def update_object(self):
-        if self.tex:
-            self.tex.name = self.lineEdit_name.text()
-            self.tex.description = self.lineEdit_description.text()
-            self.tex.baseline_repetitions = self.spinBox_repetitions.value()
-            if self.checkBox_weight.isChecked():
-                print('weight')
-                if self.checkBox_body_weight.isChecked():
-                    print('body weight')
-                    self.tex.tex_usr_id = self.usr.usr_id
-                else:
-                    print('custom weight')
-                    self.tex.baseline_weight = self.doubleSpinBox_weight.value()
-            if self.checkBox_duration.isChecked():
-                print('duration')
-                self.tex.baseline_duration = self.doubleSpinBox_duration.value()
-        else:
-            raise ValueError('No Training program object for updating.')

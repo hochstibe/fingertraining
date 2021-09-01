@@ -3,7 +3,7 @@
 # Folder: speck_weg File: db.py
 #
 
-from typing import List, Any, Type, TYPE_CHECKING
+from typing import List, Any, Type, Union, TYPE_CHECKING
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
@@ -15,29 +15,38 @@ if TYPE_CHECKING:
     from sqlalchemy import Column
     from sqlalchemy.orm import DeclarativeMeta
 
-engine = create_engine('postgresql://postgres:postgres@localhost:5432/speck_weg',
-                       echo=True, future=True)  # echo -> stdout, future -> sqlalchemy 2.0 style
 
-# Temporary drop for changes in tables and models
-# metadata.drop_all(engine)
-metadata.create_all(engine)
+def start_session(drop_all=False):
+    engine = create_engine('postgresql://postgres:postgres@localhost:5432/speck_weg',
+                           echo=True, future=True)  # echo -> stdout, future -> sqlalchemy 2.0 style
 
-# Start the session
-session = Session(engine)
+    # Temporary drop for changes in tables and models
+    if drop_all:
+        metadata.drop_all(engine)
+
+    metadata.create_all(engine)
+
+    # Start the session
+    session = Session(engine)
+    return session
 
 
 class CRUD:
 
-    def __init__(self, s: 'Session' = None):
+    def __init__(self, s: 'Session' = None, drop_all=False):
         if s:
             self.session = s
         else:
-            self.session = session
+            self.session = start_session(drop_all)
 
-    def create(self, obj: 'DeclarativeMeta'):
+    def create(self, obj: Union[List, 'DeclarativeMeta']):
 
         try:
-            self.session.add(obj)
+            if isinstance(obj, list):
+                for o in obj:
+                    self.session.add(o)
+            else:
+                self.session.add(obj)
             self.session.commit()
         except Exception as exc:
             print(exc)

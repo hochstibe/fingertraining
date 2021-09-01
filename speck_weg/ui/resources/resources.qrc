@@ -1,5 +1,9 @@
 <RCC>
   <qresource prefix="icons">
+    <file>angle-double-left-solid.svg</file>
+    <file>angle-double-right-solid.svg</file>
+    <file>angle-left-solid.svg</file>
+    <file>angle-right-solid.svg</file>
     <file>file-import-solid.svg</file>
     <file>pencil-alt-solid.svg</file>
     <file>arrow-left-solid.svg</file>

@@ -3,7 +3,7 @@
 # Folder: speck_weg/ui File: dialog_workout.py
 #
 
-from typing import List, Optional, Union, TYPE_CHECKING
+from typing import List, Tuple, Optional, Union, TYPE_CHECKING
 
 from PyQt5.QtWidgets import QDialog, QMessageBox
 
@@ -46,6 +46,7 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
         # List of [index, planned exercise, logged exercise
         self.exercises: List[List['TrainingExercise', Optional[WorkoutExercise]]] = []
         self.current_pos: int = -1
+        self.current_set: int = -1
         self.baseline_weight: Optional[float] = None
         self.baseline_duration: Optional[float] = None
 
@@ -62,7 +63,8 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
 
         # Generate a list for all exercises (pairs for planned an done exercises
         self.exercises = [
-            [tpe.training_exercise, None] for tpe in self.parent_tpr.training_exercises
+            [tpe.training_exercise, [None for _ in range(tpe.training_exercise.baseline_sets)]]
+            for tpe in self.parent_tpr.training_exercises
         ]
         # self.exercises.insert(0, [0, None, None])
         # self.exercises.append([len(self.exercises), None, None])
@@ -71,22 +73,47 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
 
         self.update_dialog()
 
+    @property
+    def current_exercise(self) -> Union[
+        Tuple['TrainingExercise', Optional['WorkoutExercise']],
+        None
+    ]:
+        """
+        :return: Current TrainingExercise,  current WorkoutExercise (if already saved)
+        """
+        if self.current_pos in range(len(self.exercises)):
+            tex, wexes = self.exercises[self.current_pos]
+            wex = wexes[self.current_set - 1]
+            print(tex, wex)
+            return tex, wex
+        else:
+            print('out of range', self.current_pos, len(self.exercises))
+            return None
+
+    @current_exercise.setter
+    def current_exercise(self, wex: 'WorkoutExercise'):
+        if self.current_pos in range(len(self.exercises)):
+            tex, wexes = self.exercises[self.current_pos]
+            wexes[self.current_set - 1] = wex
+
     def connect(self):
         """
         Connect all signals to their slots
         """
         # The signal from cancel is already connected to reject() from the dialog
         self.pushButton_save_exercise.clicked.connect(self.save)
-        self.pushButton_previous.clicked.connect(self.previous_exercise)
-        self.pushButton_next.clicked.connect(self.next_exercise)
+        self.pushButton_previous_exercise.clicked.connect(self.previous_exercise)
+        self.pushButton_next_exercise.clicked.connect(self.next_exercise)
 
         self.doubleSpinBox_weight.valueChanged.connect(self.weight_changed)
         self.doubleSpinBox_ratio.valueChanged.connect(self.ratio_changed)
 
     def save(self):
         if self.current_pos == -1:
+            # start
             self.save_session()
         elif self.current_pos == len(self.exercises):
+            # stop
             self.save_session()
         else:
             self.save_exercise()
@@ -101,6 +128,9 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
         self.db.update()
         print('dirty', self.wse in self.db.session.dirty)
 
+        score = self.assess_session()
+        self.assess_session_set_text(score)
+
     def save_exercise(self):
         # Return the object, add to the db from main window
         tex, wex = self.current_exercise
@@ -109,8 +139,12 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
         if wex:
             print('  existing', wex)
             # The exercise already exists in the database
+            wex.set = self.current_set
             wex.repetitions = self.spinBox_repetitions.value()
-            wex.weight = self.doubleSpinBox_weight.value()
+            if self.baseline_weight:
+                wex.weight = self.doubleSpinBox_weight.value()
+            if self.baseline_duration:
+                wex.duration = self.doubleSpinBox_duration.value()
             wex.description = self.textEdit_comment.toPlainText()
 
             self.db.update()
@@ -128,6 +162,8 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
             wex = WorkoutExercise(
                 wex_wse_id=self.wse.wse_id,
                 wex_tex_id=tex.tex_id,
+                sequence=self.current_pos + 1,  # the position equals the sequence in the tpe
+                set=self.current_set,
                 repetitions=self.spinBox_repetitions.value(),
                 weight=weight,
                 duration=duration
@@ -136,21 +172,67 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
             self.db.create(wex)
 
         # Add the tex to the wex
-        self.current_exercise[1] = wex
+        self.current_exercise = wex
         print(self.current_exercise)
+
+        # assess the score of the exercise
+        score = self.assess_exercise(tex, wex)
+        self.assess_exercise_set_text(score)
 
     def previous_exercise(self):
         print('previous exercise')
         # minimum position: -1
-        if self.current_pos > -1:
+        if len(self.exercises) == self.current_pos:
+            # end position, go to last set of the last exercise, current_set was not changed
             self.current_pos -= 1
+            tex, wex = self.current_exercise
+            self.current_set = tex.baseline_sets
+
+        elif 0 == self.current_pos:
+            if self.current_set == 1:
+                # go to start position
+                self.current_pos -= 1
+            else:
+                self.current_set -= 1
+
+        elif self.current_pos > -1:
+            if self.current_set > 1:
+                # previous set of the current exercise
+                self.current_set -= 1
+            else:
+                # last set of the previous exercise
+                self.current_pos -= 1
+                tex, wex = self.current_exercise
+                self.current_set = tex.baseline_sets
+
         self.update_dialog()
 
     def next_exercise(self):
         print('next exercise')
         # maximum position: len(self.exercises)
-        if self.current_pos < len(self.exercises):
+
+        if self.current_pos == len(self.exercises) - 1:
+            tex, wex = self.current_exercise
+            if self.current_set == tex.baseline_sets:
+                # go to end position
+                self.current_pos += 1
+            else:
+                self.current_set += 1
+
+        elif -1 == self.current_pos:
+            # start position, go to first set of the first exercise
             self.current_pos += 1
+            self.current_set = 1
+        elif self.current_pos < len(self.exercises):
+            tex, wex = self.current_exercise
+            if self.current_set < tex.baseline_sets:
+                # next set of the current exercise
+                self.current_set += 1
+            else:
+                # first set of the next exercise
+                self.current_pos += 1
+                self.current_set = 1
+
         self.update_dialog()
 
     def weight_changed(self):
@@ -183,35 +265,42 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
         self.doubleSpinBox_ratio.setEnabled(True)
         self.doubleSpinBox_duration.setEnabled(True)
         self.textEdit_comment.setEnabled(True)
-        self.pushButton_previous.setEnabled(True)
-        self.pushButton_next.setEnabled(True)
+        self.pushButton_previous_exercise.setEnabled(True)
+        self.pushButton_next_exercise.setEnabled(True)
         self.pushButton_save_exercise.setEnabled(True)
 
+        self.label_program.setText(f'{self.parent_tpr.training_theme.name}: {self.parent_tpr.name}')
         if self.current_pos <= -1:
             self.current_pos = -1
             print('  setting start')
             self.label_exercise.setText('Start')
+            self.label_sets.setText('')
             # enable / disable buttons / input
             self.spinBox_repetitions.setEnabled(False)
             self.doubleSpinBox_weight.setEnabled(False)
             self.doubleSpinBox_ratio.setEnabled(False)
             self.doubleSpinBox_duration.setEnabled(False)
-            self.pushButton_previous.setEnabled(False)
+            self.pushButton_previous_exercise.setEnabled(False)
             # update widgets
             self.textEdit_comment.setText(self.wse.comment)
+            score = self.assess_session()
+            self.assess_session_set_text(score)
 
         elif self.current_pos >= len(self.exercises):
             print('  setting end')
             self.label_exercise.setText('Ende')
+            self.label_sets.setText('')
             self.current_pos = len(self.exercises)
             # enable / disable buttons / input
             self.spinBox_repetitions.setEnabled(False)
             self.doubleSpinBox_weight.setEnabled(False)
             self.doubleSpinBox_ratio.setEnabled(False)
             self.doubleSpinBox_duration.setEnabled(False)
-            self.pushButton_next.setEnabled(False)
+            self.pushButton_next_exercise.setEnabled(False)
             # update widgets
             self.textEdit_comment.setText(self.wse.comment)
+            score = self.assess_session()
+            self.assess_session_set_text(score)
         else:
             print('  setting exercise')
             # Add the information from the current tex and wex
@@ -231,6 +320,8 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
                 self.baseline_duration = None
 
             self.label_exercise.setText(tex.name)
+            self.label_sets.setText(f'Set {self.current_set} / {tex.baseline_sets}')
+
             if not self.baseline_weight:
                 self.doubleSpinBox_weight.setEnabled(False)
                 self.doubleSpinBox_ratio.setEnabled(False)
@@ -258,6 +349,8 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
                 self.doubleSpinBox_duration.clear()
 
             self.textEdit_comment.setText(wex.comment)
+            score = self.assess_exercise(tex, wex)
+            self.assess_exercise_set_text(score)
 
         else:  # set the default values of the training exercise
             print(tex.baseline_repetitions, tex.baseline_weight, tex.baseline_duration)
@@ -274,11 +367,72 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
             else:
                 self.doubleSpinBox_duration.clear()
             self.textEdit_comment.clear()  # no comment yet
+            self.assess_exercise_set_text(None)
 
-    @property
-    def current_exercise(self) -> Union[List, None]:
-        if self.current_pos in range(len(self.exercises)):
-            return self.exercises[self.current_pos]
+    # def assess_current_exercise(self) -> Optional[float]:
+    #     if self.current_pos in range(len(self.exercises)):
+    #         tex, wex = self.current_exercise
+    #
+    #         score = self.assess_exercise(tex, wex)
+    #         return score
+    #     return None
+
+    def assess_exercise(self, tex: 'TrainingExercise', wex: Optional['WorkoutExercise']
+                        ) -> Optional[float]:
+
+        if wex:
+            score = wex.repetitions / tex.baseline_repetitions
+            if tex.baseline_weight:
+                score *= wex.weight / tex.baseline_weight
+            if tex.baseline_duration:
+                score *= wex.duration / tex.baseline_duration
+            return score
+
+        return None  # if start / end or no wex yet
+
+    def assess_exercise_set_text(self, score: Optional['float']):
+        if score:
+            self.lineEdit_assessment.setText(f'{score*100:.2f} %')
         else:
-            print('out of range', self.current_pos, len(self.exercises))
-            return None
+            self.lineEdit_assessment.setText('Noch nicht gespeichert')
+
+    def assess_session(self):
+
+        score = 1
+        skipped = 0
+        print(self.exercises)
+        for tex, wexes in self.exercises:
+            tex_score = 1
+            wex_skipped = 0
+            for i, wex in enumerate(wexes):
+                if wex:
+                    if i < tex.baseline_sets:
+                        tex_score *= self.assess_exercise(tex, wex)
+                    else:  # additional sets increase with +
+                        tex_score += self.assess_exercise(tex, wex) / tex.baselin_sets
+
+                else:  # no workout saved for the set
+                    print('no workout saved for the set')
+                    # print(tex_score, tex_score / tex.baseline_sets)
+                    # tex_score -= tex_score / tex.baseline_sets
+                    wex_skipped += 1
+            tex_score -= tex_score * wex_skipped / len(wexes)
+            if tex_score == 0:
+                print('no exercise saved for tex', tex)
+                skipped += 1
+            else:
+                score *= tex_score
+
+        score -= score * skipped / len(self.exercises)
+
+        return score
+
+    def assess_session_set_text(self, score: Optional[float]):
+        if not score:
+            score = self.assess_session()
+
+        if score == float(0):
+            self.lineEdit_assessment.setText('Noch keine Übungen gespeichert.')
+        else:
+            self.lineEdit_assessment.setText(f'{score*100:.2f} %')
+

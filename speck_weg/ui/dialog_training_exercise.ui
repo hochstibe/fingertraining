@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>464</width>
-    <height>282</height>
+    <height>306</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -50,6 +50,25 @@
        <property name="text">
         <string>&amp;Beschreibung</string>
        </property>
+       <property name="buddy">
+        <cstring>textEdit_description</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QTextEdit" name="textEdit_description">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="tabChangesFocus">
+        <bool>true</bool>
+       </property>
+       <property name="placeholderText">
+        <string>Optionale Beschreibung</string>
+       </property>
       </widget>
      </item>
      <item row="2" column="0">
@@ -66,28 +85,37 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
+     <item row="5" column="0">
       <widget class="QLabel" name="label_repetitions">
+       <property name="toolTip">
+        <string>Wiederholungen in einem Set.</string>
+       </property>
        <property name="text">
         <string>Wiederholungen</string>
        </property>
+       <property name="buddy">
+        <cstring>spinBox_repetitions</cstring>
+       </property>
       </widget>
      </item>
-     <item row="4" column="1">
+     <item row="5" column="1">
       <widget class="QSpinBox" name="spinBox_repetitions">
        <property name="value">
         <number>7</number>
        </property>
       </widget>
      </item>
-     <item row="5" column="0">
+     <item row="6" column="0">
       <widget class="QLabel" name="label_weight">
        <property name="text">
         <string>Gewicht</string>
        </property>
+       <property name="buddy">
+        <cstring>doubleSpinBox_weight</cstring>
+       </property>
       </widget>
      </item>
-     <item row="5" column="1">
+     <item row="6" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
         <widget class="QCheckBox" name="checkBox_weight">
@@ -124,14 +152,17 @@
        </item>
       </layout>
      </item>
-     <item row="6" column="0">
+     <item row="7" column="0">
       <widget class="QLabel" name="label_duration">
        <property name="text">
         <string>Dauer</string>
        </property>
+       <property name="buddy">
+        <cstring>doubleSpinBox_duration</cstring>
+       </property>
       </widget>
      </item>
-     <item row="6" column="1">
+     <item row="7" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
         <widget class="QCheckBox" name="checkBox_duration">
@@ -158,10 +189,20 @@
        </item>
       </layout>
      </item>
-     <item row="1" column="1">
-      <widget class="QTextEdit" name="textEdit_description">
-       <property name="placeholderText">
-        <string>Optionale Beschreibung</string>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_sets">
+       <property name="text">
+        <string>Sets</string>
+       </property>
+       <property name="buddy">
+        <cstring>spinBox_sets</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QSpinBox" name="spinBox_sets">
+       <property name="value">
+        <number>3</number>
        </property>
       </widget>
      </item>
@@ -226,6 +267,20 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>lineEdit_name</tabstop>
+  <tabstop>textEdit_description</tabstop>
+  <tabstop>spinBox_sets</tabstop>
+  <tabstop>spinBox_repetitions</tabstop>
+  <tabstop>checkBox_weight</tabstop>
+  <tabstop>checkBox_body_weight</tabstop>
+  <tabstop>doubleSpinBox_weight</tabstop>
+  <tabstop>checkBox_duration</tabstop>
+  <tabstop>doubleSpinBox_duration</tabstop>
+  <tabstop>pushButton_save</tabstop>
+  <tabstop>pushButton_import</tabstop>
+  <tabstop>pushButton_close</tabstop>
+ </tabstops>
  <resources>
   <include location="resources/resources.qrc"/>
  </resources>
@@ -238,7 +293,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>453</x>
-     <y>271</y>
+     <y>372</y>
     </hint>
     <hint type="destinationlabel">
      <x>180</x>

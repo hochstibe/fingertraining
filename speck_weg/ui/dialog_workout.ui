@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>441</width>
-    <height>393</height>
+    <height>353</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -49,6 +49,16 @@
      </property>
      <property name="text">
       <string>[Exercise name]</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_sets">
+     <property name="text">
+      <string>Set X / Y</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -130,6 +140,9 @@
          <property name="toolTip">
           <string>Gewicht in [kg] oder ein Verhältnis angeben.</string>
          </property>
+         <property name="decimals">
+          <number>2</number>
+         </property>
          <property name="minimum">
           <double>0.010000000000000</double>
          </property>
@@ -174,6 +187,9 @@
        <property name="suffix">
         <string> s</string>
        </property>
+       <property name="singleStep">
+        <double>1.000000000000000</double>
+       </property>
        <property name="value">
         <double>7.000000000000000</double>
        </property>
@@ -191,8 +207,37 @@
      </item>
      <item row="3" column="1">
       <widget class="QTextEdit" name="textEdit_comment">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="tabChangesFocus">
+        <bool>true</bool>
+       </property>
        <property name="placeholderText">
         <string>Optionaler Kommentar</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_assessment">
+       <property name="text">
+        <string>Bewertung</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLineEdit" name="lineEdit_assessment">
+       <property name="toolTip">
+        <string>Bewertung einer erfolgreichen Session und der einzelnen Übungen.</string>
+       </property>
+       <property name="text">
+        <string>Noch nicht gespeichert.</string>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -227,7 +272,18 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_previous">
+      <widget class="QPushButton" name="pushButton_previous_set">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="resources/resources.qrc">
+         <normaloff>:/icons/angle-double-left-solid.svg</normaloff>:/icons/angle-double-left-solid.svg</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_previous_exercise">
        <property name="toolTip">
         <string>Vorherige Übung</string>
        </property>
@@ -236,7 +292,7 @@
        </property>
        <property name="icon">
         <iconset resource="resources/resources.qrc">
-         <normaloff>:/icons/arrow-left-solid.svg</normaloff>:/icons/arrow-left-solid.svg</iconset>
+         <normaloff>:/icons/angle-left-solid.svg</normaloff>:/icons/angle-left-solid.svg</iconset>
        </property>
       </widget>
      </item>
@@ -254,7 +310,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_next">
+      <widget class="QPushButton" name="pushButton_next_exercise">
        <property name="toolTip">
         <string>Nächste Übung</string>
        </property>
@@ -263,10 +319,21 @@
        </property>
        <property name="icon">
         <iconset resource="resources/resources.qrc">
-         <normaloff>:/icons/arrow-right-solid.svg</normaloff>:/icons/arrow-right-solid.svg</iconset>
+         <normaloff>:/icons/angle-right-solid.svg</normaloff>:/icons/angle-right-solid.svg</iconset>
        </property>
        <property name="default">
         <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_next_set">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="resources/resources.qrc">
+         <normaloff>:/icons/angle-double-right-solid.svg</normaloff>:/icons/angle-double-right-solid.svg</iconset>
        </property>
       </widget>
      </item>
@@ -318,9 +385,9 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>pushButton_next</tabstop>
+  <tabstop>pushButton_next_exercise</tabstop>
   <tabstop>pushButton_close</tabstop>
-  <tabstop>pushButton_previous</tabstop>
+  <tabstop>pushButton_previous_exercise</tabstop>
  </tabstops>
  <resources>
   <include location="resources/resources.qrc"/>
