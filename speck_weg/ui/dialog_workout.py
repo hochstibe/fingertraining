@@ -101,8 +101,9 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
         self.pushButton_delete.clicked.connect(self.delete)
         self.pushButton_previous_exercise.clicked.connect(self.previous_exercise)
         self.pushButton_next_exercise.clicked.connect(self.next_exercise)
-        self.pushButton_start.clicked.connect(self.previous_exercise, -1)
-        self.pushButton_end.clicked.connect(self.next_exercise, len(self.exercises))
+        # not working properly, use separate functions
+        # self.pushButton_start.clicked.connect(lambda: self.previous_exercise(-1))
+        # self.pushButton_end.clicked.connect(lambda: self.next_exercise(len(self.exercises)))
 
         self.doubleSpinBox_weight.valueChanged.connect(self.weight_changed)
         self.doubleSpinBox_ratio.valueChanged.connect(self.ratio_changed)
@@ -169,7 +170,7 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
 
         else:
             if self.baseline_weight:
-                weight = self.doubleSpinBox_weight.value() * self.doubleSpinBox_ratio.value()
+                weight = self.doubleSpinBox_weight.value()
             else:
                 weight = None
             if self.baseline_duration:
@@ -299,7 +300,9 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
         self.pushButton_save.setEnabled(True)
         self.pushButton_delete.setEnabled(True)
 
-        self.label_program.setText(f'{self.parent_tpr.training_theme.name}: {self.parent_tpr.name}')
+        self.label_program.setText(
+            f'{self.parent_tpr.training_theme.name}: {self.parent_tpr.name}'
+        )
         if self.current_pos <= -1:
             self.current_pos = -1
             self.baseline_weight = None
@@ -408,16 +411,15 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
             self.textEdit_comment.clear()  # no comment yet
             self.assess_exercise_set_text(None)
 
-    @staticmethod
-    def assess_exercise(tex: 'TrainingExercise', wex: Optional['WorkoutExercise']
+    def assess_exercise(self, tex: 'TrainingExercise', wex: Optional['WorkoutExercise']
                         ) -> Optional[float]:
 
         if wex:
             score = wex.repetitions / tex.baseline_repetitions
-            if tex.baseline_weight:
-                score *= wex.weight / tex.baseline_weight
-            if tex.baseline_duration:
-                score *= wex.duration / tex.baseline_duration
+            if self.baseline_weight:  # tex.baseline_weight or usr.weight
+                score *= wex.weight / self.baseline_weight
+            if self.baseline_duration:
+                score *= wex.duration / self.baseline_duration
             return score
 
         return None  # if start / end or no wex yet
