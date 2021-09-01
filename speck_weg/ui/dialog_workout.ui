@@ -272,7 +272,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_previous_set">
+      <widget class="QPushButton" name="pushButton_start">
        <property name="text">
         <string/>
        </property>
@@ -297,7 +297,14 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_save_exercise">
+      <widget class="QPushButton" name="pushButton_delete">
+       <property name="text">
+        <string>&amp;Löschen</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_save">
        <property name="toolTip">
         <string>Speichern und zur nächsten Übung springen</string>
        </property>
@@ -327,7 +334,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_next_set">
+      <widget class="QPushButton" name="pushButton_end">
        <property name="text">
         <string/>
        </property>

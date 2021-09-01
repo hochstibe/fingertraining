@@ -5,10 +5,11 @@
 
 from typing import TYPE_CHECKING
 import PyQt5.QtCore
-from PyQt5.QtWidgets import QMainWindow, QMessageBox
+from PyQt5.QtWidgets import QMainWindow
 from sqlalchemy import select
 
 from . import ThemeDialog, ProgramDialog, ExerciseDialog, WorkoutDialog, UserDialog
+from.messages import open_message_box
 from .main_window_ui import Ui_MainWindow_training
 from ..models import TrainingTheme, User
 
@@ -377,23 +378,17 @@ class MainWindow(QMainWindow, Ui_MainWindow_training):
 
         else:
             print('No program selected')
-            msg = QMessageBox()
-
-            msg.setIcon(QMessageBox.Information)
-            msg.setWindowTitle('Kein Programm ausgewählt')
-            msg.setText('Bitte wählen Sie ein Programm aus, um ein Workout zu starten.')
-            msg.setStandardButtons(QMessageBox.Ok)
-
-            msg.exec()
+            title = 'Kein Programm ausgewählt'
+            text = 'Bitte wählen Sie ein Programm aus, um ein Workout zu starten.'
+            open_message_box(title, text, 'information')
 
     @staticmethod
     def about():
-        msg = QMessageBox()
-        msg.setIcon(QMessageBox.Information)
-        msg.setWindowTitle('Speck Weg!')
-        msg.setText(f'Speck Weg! Version {0.1}')
-        msg.setInformativeText('Stefan Hochuli, Copyright 2021\n'
-                               'Icons von https://fontawesome.com/')
-        msg.setStandardButtons(QMessageBox.Close)
 
-        msg.exec()
+        title = 'Speck Weg!'
+        text = f'Speck Weg! Version {0.1}'
+        informative_text = 'Stefan Hochuli, Copyright 2021\n' \
+                           'Icons von https://fontawesome.com/'
+
+        open_message_box(title, text, 'information', informative_text)
+

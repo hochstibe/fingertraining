@@ -18,7 +18,8 @@ if TYPE_CHECKING:
 
 def start_session(drop_all=False):
     engine = create_engine('postgresql://postgres:postgres@localhost:5432/speck_weg',
-                           echo=True, future=True)  # echo -> stdout, future -> sqlalchemy 2.0 style
+                           echo=True, future=True)
+    # echo -> stdout, future -> sqlalchemy 2.0 style
 
     # Temporary drop for changes in tables and models
     if drop_all:
@@ -103,7 +104,16 @@ class CRUD:
         # commit recent changes
         self.session.commit()
 
-    def delete(self, obj: 'DeclarativeMeta'):
+    def delete(self, obj: Union[List, 'DeclarativeMeta']):
 
-        self.session.delete(obj)
-        self.session.commit()
+        try:
+            if isinstance(obj, list):
+                for o in obj:
+                    self.session.delete(o)
+            else:
+                self.session.delete(obj)
+            self.session.commit()
+
+        except Exception as exc:
+            print(exc)
+            raise exc

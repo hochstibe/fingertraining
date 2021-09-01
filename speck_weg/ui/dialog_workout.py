@@ -5,10 +5,11 @@
 
 from typing import List, Tuple, Optional, Union, TYPE_CHECKING
 
-from PyQt5.QtWidgets import QDialog, QMessageBox
+from PyQt5.QtWidgets import QDialog
 
 from ..models import WorkoutSession, WorkoutExercise, TrainingExercise, User
 from .dialog_workout_ui import Ui_Dialog_workout
+from .messages import open_message_box
 
 if TYPE_CHECKING:
     from ..db import CRUD
@@ -25,6 +26,8 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
 
         self.wse: Optional['WorkoutSession'] = obj
         self.parent_tpr: 'TrainingProgram' = parent_tpr
+        # List of [planned exercise, [logged sets of the exercise]]
+        self.exercises: List[List['TrainingExercise', List[Optional[WorkoutExercise]]]] = []
 
         self.setupUi(self)
         self.connect()
@@ -34,17 +37,10 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
         if not self.usr:
 
             print('No program selected')
-            msg = QMessageBox()
+            title = 'Kein Programm ausgewählt.'
+            text = 'Bitte zuerst ein Programm auswählen und anschliessend das Workout starten.'
+            open_message_box(title, text, 'information')
 
-            msg.setIcon(QMessageBox.Information)
-            msg.setWindowTitle('Kein User angegeben')
-            msg.setText('Bitte zuerst das Gewicht eingeben.')
-            msg.setStandardButtons(QMessageBox.Ok)
-
-            msg.exec()
-
-        # List of [index, planned exercise, logged exercise
-        self.exercises: List[List['TrainingExercise', Optional[WorkoutExercise]]] = []
         self.current_pos: int = -1
         self.current_set: int = -1
         self.baseline_weight: Optional[float] = None
@@ -101,9 +97,12 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
         Connect all signals to their slots
         """
         # The signal from cancel is already connected to reject() from the dialog
-        self.pushButton_save_exercise.clicked.connect(self.save)
+        self.pushButton_save.clicked.connect(self.save)
+        self.pushButton_delete.clicked.connect(self.delete)
         self.pushButton_previous_exercise.clicked.connect(self.previous_exercise)
         self.pushButton_next_exercise.clicked.connect(self.next_exercise)
+        self.pushButton_start.clicked.connect(self.previous_exercise, -1)
+        self.pushButton_end.clicked.connect(self.next_exercise, len(self.exercises))
 
         self.doubleSpinBox_weight.valueChanged.connect(self.weight_changed)
         self.doubleSpinBox_ratio.valueChanged.connect(self.ratio_changed)
@@ -117,6 +116,25 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
             self.save_session()
         else:
             self.save_exercise()
+
+    def delete(self):
+        if self.current_pos == -1 or self.current_pos == len(self.exercises):
+            # start or end
+            title = 'Session löschen'
+            text = 'Die Session wird geschlossen und gelöscht. ' \
+                   'Alle gespeicherten Übungen werden ebenfalls gelöscht.'
+            clicked = open_message_box(title, text, 'question',
+                                       button_accept_name='Löschen')
+            if clicked:
+                if self.wse.workout_exercises:
+                    self.db.delete(self.wse.workout_exercises)
+                self.db.delete(self.wse)
+                self.reject()
+
+            # self.db.delete(self.wse)
+        else:
+            tex, wex = self.current_exercise
+            self.db.delete(wex)
 
     def save_session(self):
         print('saving session (comment)')
@@ -179,9 +197,12 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
         score = self.assess_exercise(tex, wex)
         self.assess_exercise_set_text(score)
 
-    def previous_exercise(self):
+    def previous_exercise(self, goto: int = None):
         print('previous exercise')
         # minimum position: -1
+        if goto:
+            self.current_pos = goto + 1
+
         if len(self.exercises) == self.current_pos:
             # end position, go to last set of the last exercise, current_set was not changed
             self.current_pos -= 1
@@ -198,18 +219,22 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
         elif self.current_pos > -1:
             if self.current_set > 1:
                 # previous set of the current exercise
+                print('previous set of the current exercise')
                 self.current_set -= 1
             else:
                 # last set of the previous exercise
+                print('last set of the previous exercise')
                 self.current_pos -= 1
                 tex, wex = self.current_exercise
                 self.current_set = tex.baseline_sets
 
         self.update_dialog()
 
-    def next_exercise(self):
+    def next_exercise(self, goto: int = None):
         print('next exercise')
         # maximum position: len(self.exercises)
+        if goto:
+            self.current_pos = goto - 1
 
         if self.current_pos == len(self.exercises) - 1:
             tex, wex = self.current_exercise
@@ -227,9 +252,11 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
             tex, wex = self.current_exercise
             if self.current_set < tex.baseline_sets:
                 # next set of the current exercise
+                print('next set of the current exercise')
                 self.current_set += 1
             else:
                 # first set of the next exercise
+                print('first set of the next exercise')
                 self.current_pos += 1
                 self.current_set = 1
 
@@ -267,11 +294,17 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
         self.textEdit_comment.setEnabled(True)
         self.pushButton_previous_exercise.setEnabled(True)
         self.pushButton_next_exercise.setEnabled(True)
-        self.pushButton_save_exercise.setEnabled(True)
+        self.pushButton_start.setEnabled(True)
+        self.pushButton_end.setEnabled(True)
+        self.pushButton_save.setEnabled(True)
+        self.pushButton_delete.setEnabled(True)
 
         self.label_program.setText(f'{self.parent_tpr.training_theme.name}: {self.parent_tpr.name}')
         if self.current_pos <= -1:
             self.current_pos = -1
+            self.baseline_weight = None
+            self.baseline_duration = None
+
             print('  setting start')
             self.label_exercise.setText('Start')
             self.label_sets.setText('')
@@ -281,12 +314,17 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
             self.doubleSpinBox_ratio.setEnabled(False)
             self.doubleSpinBox_duration.setEnabled(False)
             self.pushButton_previous_exercise.setEnabled(False)
+            self.pushButton_start.setEnabled(False)
             # update widgets
             self.textEdit_comment.setText(self.wse.comment)
             score = self.assess_session()
             self.assess_session_set_text(score)
 
         elif self.current_pos >= len(self.exercises):
+            self.current_pos = len(self.exercises)
+            self.baseline_weight = None
+            self.baseline_duration = None
+
             print('  setting end')
             self.label_exercise.setText('Ende')
             self.label_sets.setText('')
@@ -297,6 +335,7 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
             self.doubleSpinBox_ratio.setEnabled(False)
             self.doubleSpinBox_duration.setEnabled(False)
             self.pushButton_next_exercise.setEnabled(False)
+            self.pushButton_end.setEnabled(False)
             # update widgets
             self.textEdit_comment.setText(self.wse.comment)
             score = self.assess_session()
@@ -369,15 +408,8 @@ class WorkoutDialog(QDialog, Ui_Dialog_workout):
             self.textEdit_comment.clear()  # no comment yet
             self.assess_exercise_set_text(None)
 
-    # def assess_current_exercise(self) -> Optional[float]:
-    #     if self.current_pos in range(len(self.exercises)):
-    #         tex, wex = self.current_exercise
-    #
-    #         score = self.assess_exercise(tex, wex)
-    #         return score
-    #     return None
-
-    def assess_exercise(self, tex: 'TrainingExercise', wex: Optional['WorkoutExercise']
+    @staticmethod
+    def assess_exercise(tex: 'TrainingExercise', wex: Optional['WorkoutExercise']
                         ) -> Optional[float]:
 
         if wex:
