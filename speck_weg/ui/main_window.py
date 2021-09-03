@@ -6,12 +6,11 @@
 from typing import TYPE_CHECKING
 import PyQt5.QtCore
 from PyQt5.QtWidgets import QMainWindow
-from sqlalchemy import select
 
 from . import ThemeDialog, ProgramDialog, ExerciseDialog, WorkoutDialog, UserDialog
-from.messages import open_message_box
+from .messages import open_message_box
 from .main_window_ui import Ui_MainWindow_training
-from ..models import TrainingTheme, User
+from ..app import SpeckWeg
 
 if TYPE_CHECKING:
     from ..db import CRUD
@@ -19,21 +18,23 @@ if TYPE_CHECKING:
 user_role = PyQt5.QtCore.Qt.UserRole
 
 
-class MainWindow(QMainWindow, Ui_MainWindow_training):
+class MainWindow(SpeckWeg, QMainWindow, Ui_MainWindow_training):
     def __init__(self, db: 'CRUD', parent=None):
-        super().__init__(parent)
+        super().__init__(db=db, parent=parent)
 
-        self.db = db
+        # self.db = db
 
         self.setupUi(self)
-        self.theme_list_refresh()
         self.connect()
 
         # There must be one user in the database
-        self.usr = self.db.read_first(User)
+        # self.usr = self.db.read_first(User)
 
-        if not self.usr:
+        if not self.user.usr:
+            print(self.user.usr)
             self.action_start_workout.setEnabled(False)
+
+        self.theme_list_refresh()
 
     def connect(self):
         """
@@ -65,53 +66,41 @@ class MainWindow(QMainWindow, Ui_MainWindow_training):
 
         # self.listWidget_program.itemSelectionChanged.connect(self.tester)
 
-    def theme_moved(self):
-        print('theme moved')
-        for i in range(self.listWidget_theme.count()):
-            tth = self.listWidget_theme.item(i).data(user_role)
-            tth.sequence = i + 1
-        self.db.update()
-
-        self.program_list_refresh()
-
-    def program_moved(self):
-        print('rows moved')
-        for i in range(self.listWidget_program.count()):
-            tpr = self.listWidget_program.item(i).data(user_role)
-            tpr.sequence = i + 1
-        self.db.update()
-
-        self.exercise_list_refresh()
-
-    def exercise_moved(self):
-        print('exercise moved')
-
-        program = self.listWidget_program.currentItem()
-        if program:  # should always be true (no program selected, no exercise displayed)
-            tpr = program.data(user_role)
-            for i in range(self.listWidget_exercise.count()):
-                tex = self.listWidget_exercise.item(i).data(user_role)
-                # select the association object to the tex
-                tpe = [
-                    tpe for tpe in tpr.training_exercises if tpe.tpe_tex_id == tex.tex_id
-                ][0]
-                tpe.sequence = i + 1
-            self.db.update()
-
     def theme_list_refresh(self):
         print('refreshing list')
-        stmt = select(TrainingTheme).order_by(TrainingTheme.sequence).order_by(TrainingTheme.name)
-        themes = self.db.read_stmt(stmt)
+        # stmt = select(TrainingTheme).order_by(TrainingTheme.sequence).order_by(TrainingTheme.name)
+        # themes = self.db.read_stmt(stmt)
         # themes = self.db.read_all(TrainingTheme)
 
+        # themes = self.read_themes()
+        # read from db and store them in a list
+        super().theme_list_refresh()
+
+        # clear all lists
         self.listWidget_theme.clear()
         self.listWidget_program.clear()
         self.listWidget_exercise.clear()
 
-        for i, tpr in enumerate(themes):
-            print(i, tpr)
-            self.listWidget_theme.insertItem(i, tpr.name)
-            self.listWidget_theme.item(i).setData(user_role, tpr)
+        for i, tth in enumerate(self.themes):
+            print(i, tth)
+            self.listWidget_theme.insertItem(i, tth.name)
+            self.listWidget_theme.item(i).setData(user_role, tth)
+
+    def theme_moved(self):
+        print('theme moved')
+        # themes = []
+        # for i in range(self.listWidget_theme.count()):
+        #     tth = self.listWidget_theme.item(i).data(user_role)
+        #     themes.append(tth)
+        #     # tth.sequence = i + 1
+        # self.db.update()
+
+        themes = [self.listWidget_theme.item(i).data(user_role)
+                  for i in range(self.listWidget_theme.count())]
+
+        self.update_themes_sequence(themes)
+
+        self.program_list_refresh()
 
     def theme_list_clicked(self):
         theme = self.listWidget_theme.currentItem()
@@ -124,7 +113,7 @@ class MainWindow(QMainWindow, Ui_MainWindow_training):
         themes_row = self.listWidget_theme.currentRow()
         n_themes = self.listWidget_theme.count()
 
-        dialog = ThemeDialog(parent=self, db=self.db, max_sequence=self.listWidget_theme.count())
+        dialog = ThemeDialog(parent=self, db=self.db, max_sequence=n_themes)
         dialog.exec()
 
         # rejected handles escape-key, x and the close button (connected to reject()
@@ -199,6 +188,15 @@ class MainWindow(QMainWindow, Ui_MainWindow_training):
             for i, tpr in enumerate(tth.training_programs):
                 self.listWidget_program.insertItem(i, tpr.name)
                 self.listWidget_program.item(i).setData(user_role, tpr)
+
+    def program_moved(self):
+        print('rows moved')
+        for i in range(self.listWidget_program.count()):
+            tpr = self.listWidget_program.item(i).data(user_role)
+            tpr.sequence = i + 1
+        self.db.update()
+
+        self.exercise_list_refresh()
 
     def program_clicked(self):
         program = self.listWidget_program.currentItem()
@@ -286,6 +284,21 @@ class MainWindow(QMainWindow, Ui_MainWindow_training):
                 self.listWidget_exercise.item(i).setData(user_role, tpe.training_exercise)
             print('refresh done')
 
+    def exercise_moved(self):
+        print('exercise moved')
+
+        program = self.listWidget_program.currentItem()
+        if program:  # should always be true (no program selected, no exercise displayed)
+            tpr = program.data(user_role)
+            for i in range(self.listWidget_exercise.count()):
+                tex = self.listWidget_exercise.item(i).data(user_role)
+                # select the association object to the tex
+                tpe = [
+                    tpe for tpe in tpr.training_exercises if tpe.tpe_tex_id == tex.tex_id
+                ][0]
+                tpe.sequence = i + 1
+            self.db.update()
+
     def exercise_new(self):
         print('new exercise')
         program = self.listWidget_program.currentItem()
@@ -295,7 +308,7 @@ class MainWindow(QMainWindow, Ui_MainWindow_training):
         if program:
             print('opening dialog')
             dialog = ExerciseDialog(parent=self, db=self.db, parent_tpr=program.data(user_role),
-                                    usr=self.usr)
+                                    usr=self.user.usr)
             dialog.exec()
 
             # rejected handles escape-key, x and the close button (connected to reject()
@@ -324,7 +337,7 @@ class MainWindow(QMainWindow, Ui_MainWindow_training):
             dialog = ExerciseDialog(parent=self, db=self.db,
                                     obj=exercise.data(user_role),
                                     parent_tpr=program.data(user_role),
-                                    usr=self.usr)
+                                    usr=self.user.usr)
             print('starting dialog')
             dialog.exec()
 
@@ -353,15 +366,15 @@ class MainWindow(QMainWindow, Ui_MainWindow_training):
             self.listWidget_exercise.setCurrentRow(exercise_row - 1)
 
     def edit_user(self):
-        print('editing user data', self.usr)
+        print('editing user data', self.user.usr)
 
-        dialog = UserDialog(db=self.db, parent=self, obj=self.usr)
+        dialog = UserDialog(db=self.db, parent=self, obj=self.user.usr)
         dialog.exec()
 
-        # There must be one user in the database
-        self.usr = self.db.read_first(User)
+        # There must be one user in the database -> read again
+        self.user.read_current_user()
 
-        if self.usr:
+        if self.user.usr:
             self.action_start_workout.setEnabled(True)
         else:
             self.action_start_workout.setEnabled(False)
@@ -377,18 +390,7 @@ class MainWindow(QMainWindow, Ui_MainWindow_training):
             dialog.exec()
 
         else:
-            print('No program selected')
-            title = 'Kein Programm ausgewählt'
-            text = 'Bitte wählen Sie ein Programm aus, um ein Workout zu starten.'
-            open_message_box(title, text, 'information')
+            open_message_box(self.messages['no_program_selected'])
 
-    @staticmethod
-    def about():
-
-        title = 'Speck Weg!'
-        text = f'Speck Weg! Version {0.1}'
-        informative_text = 'Stefan Hochuli, Copyright 2021\n' \
-                           'Icons von https://fontawesome.com/'
-
-        open_message_box(title, text, 'information', informative_text)
-
+    def about(self):
+        open_message_box(self.messages['about'])

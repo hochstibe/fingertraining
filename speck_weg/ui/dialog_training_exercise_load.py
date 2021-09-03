@@ -10,12 +10,12 @@ import PyQt5.QtCore
 
 from sqlalchemy import select
 
-from ..models import TrainingExercise, TrainingProgramExercise
+from ..models import TrainingExerciseModel, TrainingProgramExerciseModel
 from .dialog_training_exercise_load_ui import Ui_Dialog_training_exercise_load
 
 if TYPE_CHECKING:
     from ..db import CRUD
-    from ..models import TrainingProgram, User
+    from ..models import TrainingProgramModel, UserModel
 
 
 user_role = PyQt5.QtCore.Qt.UserRole
@@ -26,14 +26,14 @@ class ExerciseLoadDialog(QDialog, Ui_Dialog_training_exercise_load):
     # tex: Optional['TrainingExercise'] = None
     # max_sequence: int = 0  # ordering sequence for the exercises, starting from 1
 
-    def __init__(self, db: 'CRUD', parent=None, parent_tpr: 'TrainingProgram' = None,
-                 usr: 'User' = None):
+    def __init__(self, db: 'CRUD', parent=None, parent_tpr: 'TrainingProgramModel' = None,
+                 usr: 'UserModel' = None):
         super().__init__(parent)
 
         self.db = db
 
-        self.parent_tpr: 'TrainingProgram' = parent_tpr
-        self.usr: 'User' = usr
+        self.parent_tpr: 'TrainingProgramModel' = parent_tpr
+        self.usr: 'UserModel' = usr
 
         self.setupUi(self)
         self.connect()
@@ -54,7 +54,7 @@ class ExerciseLoadDialog(QDialog, Ui_Dialog_training_exercise_load):
 
     def fill_exercise_list(self):
 
-        stmt = select(TrainingExercise).order_by(TrainingExercise.name)
+        stmt = select(TrainingExerciseModel).order_by(TrainingExerciseModel.name)
 
         exercises = self.db.read_stmt(stmt)
 
@@ -66,7 +66,7 @@ class ExerciseLoadDialog(QDialog, Ui_Dialog_training_exercise_load):
         exercise = self.listWidget_exercise.currentItem()
         print('Clicked on the exercise list', exercise.text())
 
-        tex: 'TrainingExercise' = exercise.data(user_role)
+        tex: 'TrainingExerciseModel' = exercise.data(user_role)
 
         self.lineEdit_name.setText(tex.name)
         self.textEdit_description.setText(tex.description)
@@ -97,7 +97,7 @@ class ExerciseLoadDialog(QDialog, Ui_Dialog_training_exercise_load):
                     max_sequence = max([tpr.sequence for tpr in self.parent_tpr.training_exercises])
                 else:
                     max_sequence = 0
-                tpe = TrainingProgramExercise(sequence=max_sequence + 1)
+                tpe = TrainingProgramExerciseModel(sequence=max_sequence + 1)
                 tpe.training_exercise = exercise.data(user_role)
                 tpe.training_program = self.parent_tpr
                 # self.parent_tpr.training_exercises.append(exercise.data(user_role))

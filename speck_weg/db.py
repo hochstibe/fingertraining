@@ -28,6 +28,18 @@ def start_session(drop_all=False):
     metadata.create_all(engine)
 
     # Start the session
+    # Todo: sessionmaker -> new session for new transactions or new session for new window
+    # https://docs.sqlalchemy.org/en/14/orm/session_basics.html
+    # scoped_session -> otherwise the objects are not within the separate sessions
+    # https://docs.sqlalchemy.org/en/14/orm/session_basics.html#session-faq-whentocreate
+    # --> now it is a session for everything (committing frequently)
+    # --> they suggest opening a session for a user-interaction
+    # --> control the session opening /closing in the app-scripts
+    # one session: read 1000 the same object -> 0.6s
+    # sessionmaker: read 1000 in new sessions -> 0.5s
+    # for the application: now the objects are read once and then passed to windows
+    # if individual sessions -> maybe query again for the object before e.g. change it
+
     session = Session(engine)
     return session
 
@@ -44,8 +56,7 @@ class CRUD:
 
         try:
             if isinstance(obj, list):
-                for o in obj:
-                    self.session.add(o)
+                self.session.add_all(obj)
             else:
                 self.session.add(obj)
             self.session.commit()
@@ -53,9 +64,7 @@ class CRUD:
             print(exc)
             raise exc
 
-    def read_first(self, cls: Type['DeclarativeMeta']) -> Any:
-
-        stmt = select(cls)
+    def read_first(self, stmt) -> Any:
 
         try:
             res = self.session.execute(stmt).scalars().first()

@@ -9,13 +9,13 @@ from typing import TYPE_CHECKING, Optional
 from PyQt5.QtWidgets import QDialog
 import PyQt5.QtCore
 
-from ..models import TrainingExercise, TrainingProgramExercise
+from ..models import TrainingExerciseModel, TrainingProgramExerciseModel
 from .dialog_training_exercise_ui import Ui_Dialog_training_exercise
 from .dialog_training_exercise_load import ExerciseLoadDialog
 
 if TYPE_CHECKING:
     from ..db import CRUD
-    from ..models import TrainingProgram, User
+    from ..models import TrainingProgramModel, UserModel
 
 
 user_role = PyQt5.QtCore.Qt.UserRole
@@ -24,15 +24,15 @@ user_role = PyQt5.QtCore.Qt.UserRole
 class ExerciseDialog(QDialog, Ui_Dialog_training_exercise):
 
     def __init__(self, db: 'CRUD', parent=None,
-                 obj: 'TrainingExercise' = None, parent_tpr: 'TrainingProgram' = None,
-                 usr: 'User' = None):
+                 obj: 'TrainingExerciseModel' = None, parent_tpr: 'TrainingProgramModel' = None,
+                 usr: 'UserModel' = None):
         super().__init__(parent)
 
         self.db = db
 
-        self.tex: Optional['TrainingExercise'] = obj
-        self.parent_tpr: 'TrainingProgram' = parent_tpr
-        self.usr: 'User' = usr
+        self.tex: Optional['TrainingExerciseModel'] = obj
+        self.parent_tpr: 'TrainingProgramModel' = parent_tpr
+        self.usr: 'UserModel' = usr
 
         self.setupUi(self)
         self.connect()
@@ -105,12 +105,12 @@ class ExerciseDialog(QDialog, Ui_Dialog_training_exercise):
 
         else:
             print('new tex')
-            self.tex = TrainingExercise()
+            self.tex = TrainingExerciseModel()
 
             self.update_exercise_object()
 
             # Association with the sequence
-            tpr_tex = TrainingProgramExercise(sequence=self.max_sequence + 1)
+            tpr_tex = TrainingProgramExerciseModel(sequence=self.max_sequence + 1)
             tpr_tex.training_exercise = self.tex
             tpr_tex.training_program = self.parent_tpr
 

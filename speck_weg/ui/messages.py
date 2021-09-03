@@ -3,45 +3,38 @@
 # Folder: speck_weg/ui File: messages.py
 #
 
+from typing import TYPE_CHECKING
 from PyQt5.QtWidgets import QMessageBox, QPushButton
 
+if TYPE_CHECKING:
+    from ..app import Message
 
-def open_message_box(title: str, text: str, level: str, informative_text: str = None,
-                     button_accept_name: str = None, button_reject_name: str = None):
-    """
-    :param title:
-    :param text:
-    :param level:
-    :param informative_text:
-    :param button_accept_name:
-    :param button_reject_name:
-    :return: True -> button_accept clicked; False -> button_reject_clicked
-    """
 
+def open_message_box(message: 'Message'):
     msg = QMessageBox()
-    if level == 'information':
+    if message.level == 'information':
         msg.setIcon(QMessageBox.Information)
-    elif level == 'question':
+    elif message.level == 'question':
         msg.setIcon(QMessageBox.Question)
-    elif level == 'warning':
+    elif message.level == 'warning':
         msg.setIcon(QMessageBox.Warning)
-    elif level == 'critical':
+    elif message.level == 'critical':
         msg.setIcon(QMessageBox.Critical)
     else:
         raise ValueError(
             "level must be one of 'information', 'question', 'warning' or 'critical'."
         )
 
-    msg.setWindowTitle(title)
-    msg.setText(text)
-    if informative_text:
-        msg.setInformativeText(informative_text)
+    msg.setWindowTitle(message.title)
+    msg.setText(message.text)
+    if message.informative_text:
+        msg.setInformativeText(message.informative_text)
 
-    if button_accept_name:
-        msg.addButton(QPushButton(button_accept_name), QMessageBox.AcceptRole)
-        if not button_reject_name:
-            button_reject_name = 'Abbrechen'
-        msg.addButton(QPushButton(button_reject_name), QMessageBox.RejectRole)
+    if message.button_accept_name:
+        msg.addButton(QPushButton(message.button_accept_name), QMessageBox.AcceptRole)
+        if not message.button_reject_name:
+            message.button_reject_name = 'Abbrechen'
+        msg.addButton(QPushButton(message.button_reject_name), QMessageBox.RejectRole)
     else:
         # default: only a OK (Yes button to close
         msg.setStandardButtons(QMessageBox.Ok)

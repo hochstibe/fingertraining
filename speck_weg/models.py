@@ -23,7 +23,7 @@ metadata = MetaData(
 Base = declarative_base(metadata=metadata)
 
 
-class TrainingTheme(Base):
+class TrainingThemeModel(Base):
     # table definitions
     __tablename__ = 'training_theme'
     __table_args__ = (
@@ -36,16 +36,16 @@ class TrainingTheme(Base):
     sequence = Column(Integer, nullable=False)
 
     # orm definitions
-    training_programs = relationship('TrainingProgram', back_populates='training_theme',
-                                     order_by='asc(TrainingProgram.sequence), '
-                                              'asc(TrainingProgram.name)')
+    training_programs = relationship('TrainingProgramModel', back_populates='training_theme',
+                                     order_by='asc(TrainingProgramModel.sequence), '
+                                              'asc(TrainingProgramModel.name)')
 
     def __repr__(self):
-        return f'TrainingTheme(' \
+        return f'TrainingThemeModel(' \
                f'tth_id={self.tth_id!r}, name={self.name!r})'
 
 
-class TrainingProgram(Base):
+class TrainingProgramModel(Base):
     # table definitions
     __tablename__ = 'training_program'
     __table_args__ = (
@@ -59,17 +59,18 @@ class TrainingProgram(Base):
     sequence = Column(Integer, nullable=False)
 
     # orm definitions
-    training_theme = relationship('TrainingTheme', back_populates='training_programs')
-    training_exercises = relationship('TrainingProgramExercise', back_populates='training_program',
-                                      order_by='asc(TrainingProgramExercise.sequence)')
-    workout_sessions = relationship('WorkoutSession', back_populates='training_program')
+    training_theme = relationship('TrainingThemeModel', back_populates='training_programs')
+    training_exercises = relationship('TrainingProgramExerciseModel',
+                                      back_populates='training_program',
+                                      order_by='asc(TrainingProgramExerciseModel.sequence)')
+    workout_sessions = relationship('WorkoutSessionModel', back_populates='training_program')
 
     def __repr__(self):
-        return f'TrainingProgram(' \
+        return f'TrainingProgramModel(' \
                f'tpr_id={self.tth_id!r}, name={self.name!r})'
 
 
-class TrainingExercise(Base):
+class TrainingExerciseModel(Base):
     # table definitions
     __tablename__ = 'training_exercise'
     # No unique constraint: Multiple exercises with the same name possible (2x half crimp big)
@@ -85,17 +86,18 @@ class TrainingExercise(Base):
     baseline_duration = Column(Float, nullable=True)
 
     # orm definitions
-    training_programs = relationship('TrainingProgramExercise', back_populates='training_exercise',
+    training_programs = relationship('TrainingProgramExerciseModel',
+                                     back_populates='training_exercise',
                                      cascade="all, delete")
-    workout_exercises = relationship('WorkoutExercise', back_populates='training_exercise')
-    user = relationship('User', back_populates='training_exercises')
+    workout_exercises = relationship('WorkoutExerciseModel', back_populates='training_exercise')
+    user = relationship('UserModel', back_populates='training_exercises')
 
     def __repr__(self):
-        return f'TrainingExercise(' \
+        return f'TrainingExerciseModel(' \
                f'tex_id={self.tex_id!r}, name={self.name!r})'
 
 
-class TrainingProgramExercise(Base):
+class TrainingProgramExerciseModel(Base):
     # table definitions
     __tablename__ = 'training_program_exercise'
 
@@ -104,15 +106,15 @@ class TrainingProgramExercise(Base):
     sequence = Column(Integer, primary_key=True, nullable=False)
 
     # orm definitions
-    training_program = relationship('TrainingProgram', back_populates='training_exercises')
-    training_exercise = relationship('TrainingExercise', back_populates='training_programs',)
+    training_program = relationship('TrainingProgramModel', back_populates='training_exercises')
+    training_exercise = relationship('TrainingExerciseModel', back_populates='training_programs',)
 
     def __repr__(self):
-        return f'TrainingProgramExercise(wse_tpe_tpr_id=({self.tpe_tpr_id!r}, ' \
+        return f'TrainingProgramExerciseModel(wse_tpe_tpr_id=({self.tpe_tpr_id!r}, ' \
                f'tpe_tex_id={self.tpe_tex_id}, sequence={self.sequence})'
 
 
-class WorkoutSession(Base):
+class WorkoutSessionModel(Base):
     # table definitions
     __tablename__ = 'workout_session'
 
@@ -123,17 +125,17 @@ class WorkoutSession(Base):
     comment = Column(String(1023), nullable=True)
 
     # orm definitions
-    training_program = relationship('TrainingProgram', back_populates='workout_sessions')
-    workout_exercises = relationship('WorkoutExercise', back_populates='workout_session',
-                                     order_by='asc(WorkoutExercise.sequence), '
-                                              'asc(WorkoutExercise.set)')
+    training_program = relationship('TrainingProgramModel', back_populates='workout_sessions')
+    workout_exercises = relationship('WorkoutExerciseModel', back_populates='workout_session',
+                                     order_by='asc(WorkoutExerciseModel.sequence), '
+                                              'asc(WorkoutExerciseModel.set)')
 
     def __repr__(self):
-        return f'WorkoutSession(' \
+        return f'WorkoutSessionModel(' \
                f'wse_id=({self.wse_id!r}, tse_tpr_id={self.wse_tpr_id}, date={self.date})'
 
 
-class WorkoutExercise(Base):
+class WorkoutExerciseModel(Base):
     # table definitions
     __tablename__ = 'workout_exercise'
 
@@ -148,15 +150,15 @@ class WorkoutExercise(Base):
     comment = Column(String(1023), nullable=True)
 
     # orm definitions
-    workout_session = relationship('WorkoutSession', back_populates='workout_exercises')
-    training_exercise = relationship('TrainingExercise', back_populates='workout_exercises')
+    workout_session = relationship('WorkoutSessionModel', back_populates='workout_exercises')
+    training_exercise = relationship('TrainingExerciseModel', back_populates='workout_exercises')
 
     def __repr__(self):
-        return f'WorkoutExercise(' \
+        return f'WorkoutExerciseModel(' \
                f'wex_id={self.wex_id}, wex_wse_id={self.wex_wse_id}, wex_tex_id={self.wex_tex_id})'
 
 
-class User(Base):
+class UserModel(Base):
     # table definitions
     __tablename__ = 'user'
 
@@ -164,7 +166,7 @@ class User(Base):
     name = Column(String(255), nullable=False)
     weight = Column(Float, nullable=False)
 
-    training_exercises = relationship('TrainingExercise', back_populates='user')
+    training_exercises = relationship('TrainingExerciseModel', back_populates='user')
 
     def __repr__(self):
-        return f'User(usr_id={self.usr_id}, name={self.name} weight={self.weight}'
+        return f'UserModel(usr_id={self.usr_id}, name={self.name} weight={self.weight}'

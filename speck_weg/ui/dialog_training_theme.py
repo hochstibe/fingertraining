@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Optional
 
 from PyQt5.QtWidgets import QDialog
 
-from ..models import TrainingTheme
+from ..models import TrainingThemeModel
 from .dialog_training_theme_ui import Ui_Dialog_training_theme
 
 if TYPE_CHECKING:
@@ -16,14 +16,14 @@ if TYPE_CHECKING:
 
 class ThemeDialog(QDialog, Ui_Dialog_training_theme):
 
-    def __init__(self, db: 'CRUD', parent=None, obj: 'TrainingTheme' = None,
+    def __init__(self, db: 'CRUD', parent=None, obj: 'TrainingThemeModel' = None,
                  max_sequence=None):
         super().__init__(parent)
         print('init theme')
 
         self.db = db
 
-        self.tth: Optional['TrainingTheme'] = obj
+        self.tth: Optional['TrainingThemeModel'] = obj
         self.max_sequence: int = max_sequence
 
         self.setupUi(self)
@@ -53,7 +53,7 @@ class ThemeDialog(QDialog, Ui_Dialog_training_theme):
 
         else:
             # Return the object, add to the db from main window
-            self.tth = TrainingTheme(
+            self.tth = TrainingThemeModel(
                 name=self.lineEdit_name.text(),
                 description=self.textEdit_description.toPlainText(),
                 sequence=self.max_sequence + 1,

@@ -9,12 +9,12 @@ from typing import TYPE_CHECKING, Optional
 from PyQt5.QtWidgets import QDialog
 import PyQt5.QtCore
 
-from ..models import TrainingProgram
+from ..models import TrainingProgramModel
 from .dialog_training_program_ui import Ui_Dialog_training_program
 
 if TYPE_CHECKING:
     from ..db import CRUD
-    from ..models import TrainingTheme
+    from ..models import TrainingThemeModel
 
 
 user_role = PyQt5.QtCore.Qt.UserRole
@@ -23,13 +23,13 @@ user_role = PyQt5.QtCore.Qt.UserRole
 class ProgramDialog(QDialog, Ui_Dialog_training_program):
 
     def __init__(self, db: 'CRUD', parent=None,
-                 obj: 'TrainingProgram' = None, parent_tth: 'TrainingTheme' = None):
+                 obj: 'TrainingProgramModel' = None, parent_tth: 'TrainingThemeModel' = None):
         super().__init__(parent)
 
         self.db = db
 
-        self.tpr: Optional['TrainingProgram'] = obj
-        self.parent_tth: 'TrainingTheme' = parent_tth
+        self.tpr: Optional['TrainingProgramModel'] = obj
+        self.parent_tth: 'TrainingThemeModel' = parent_tth
 
         self.setupUi(self)
         self.connect()
@@ -66,7 +66,7 @@ class ProgramDialog(QDialog, Ui_Dialog_training_program):
                 print(tex, tex.sequence)
         else:
             print('new program')
-            self.tpr = TrainingProgram(
+            self.tpr = TrainingProgramModel(
                 tpr_tth_id=self.parent_tth.tth_id,
                 sequence=self.max_sequence + 1
             )
