@@ -3,7 +3,12 @@
 # Folder: speck_weg/app File: __init__.py
 #
 
-from .app import Message, SpeckWeg
+from .app import (Message, SpeckWeg, TrainingTheme, TrainingThemeCollection, TrainingProgram,
+                  TrainingProgramCollection, TrainingProgramExerciseCollection,
+                  TrainingExercise, TrainingExerciseCollection, User)
 from .workout import Workout
 
-__all__ = ['SpeckWeg', 'Message', 'Workout']
+__all__ = ['SpeckWeg', 'Message', 'TrainingTheme', 'TrainingThemeCollection',
+           'TrainingProgram', 'TrainingProgramCollection',
+           'TrainingProgramExerciseCollection', 'TrainingExercise',
+           'TrainingExerciseCollection', 'User', 'Workout']

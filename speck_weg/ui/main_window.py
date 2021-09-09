@@ -27,64 +27,91 @@ class MainWindow(SpeckWeg, QMainWindow, Ui_MainWindow_training):
         self.setupUi(self)
         self.connect()
 
-        # There must be one user in the database
-        # self.usr = self.db.read_first(User)
+        # self.showMaximized()
 
-        if not self.user.usr:
-            print(self.user.usr)
+        # There must be one user in the database
+        if not self.user.model:
+            print(self.user.model)
             self.action_start_workout.setEnabled(False)
 
-        self.theme_list_refresh()
+        self.theme_list_widget_refresh()
 
     def connect(self):
         """
         Connect all signals to their slots
         """
-        self.action_about.triggered.connect(self.about)
+        self.action_about.triggered.connect(self.about_clicked)
         # Theme
         self.listWidget_theme.clicked.connect(self.theme_list_clicked)
         self.listWidget_theme.model().rowsMoved.connect(self.theme_moved)
-        self.pushButton_add_theme.clicked.connect(self.theme_new)
-        self.pushButton_remove_theme.clicked.connect(self.theme_delete)
-        self.pushButton_edit_theme.clicked.connect(self.theme_edit)
+        self.pushButton_add_theme.clicked.connect(self.theme_new_clicked)
+        self.pushButton_remove_theme.clicked.connect(self.theme_delete_clicked)
+        self.pushButton_edit_theme.clicked.connect(self.theme_edit_clicked)
         # Program
         self.listWidget_program.clicked.connect(self.program_clicked)
         self.listWidget_program.model().rowsMoved.connect(self.program_moved)
-        self.pushButton_add_program.clicked.connect(self.program_new)
-        self.pushButton_remove_program.clicked.connect(self.program_delete)
-        self.pushButton_edit_program.clicked.connect(self.program_edit)
+        self.pushButton_add_program.clicked.connect(self.program_new_clicked)
+        self.pushButton_remove_program.clicked.connect(self.program_delete_clicked)
+        self.pushButton_edit_program.clicked.connect(self.program_edit_clicked)
         # Exercise
-        # self.listWidget_exercise.clicked.connect(self.exercise_list_clicked)
+        self.listWidget_exercise.clicked.connect(self.exercise_clicked)
         self.listWidget_exercise.model().rowsMoved.connect(self.exercise_moved)
-        self.pushButton_add_exercise.clicked.connect(self.exercise_new)
-        self.pushButton_remove_exercise.clicked.connect(self.exercise_delete)
-        self.pushButton_edit_exercise.clicked.connect(self.exercise_edit)
+        self.pushButton_add_exercise.clicked.connect(self.exercise_new_clicked)
+        self.pushButton_remove_exercise.clicked.connect(self.exercise_delete_clicked)
+        self.pushButton_edit_exercise.clicked.connect(self.exercise_edit_clicked)
 
         # Actions: User, Workout
-        self.action_user_info.triggered.connect(self.edit_user)
-        self.action_start_workout.triggered.connect(self.start_workout)
+        self.action_user_info.triggered.connect(self.edit_user_clicked)
+        self.action_start_workout.triggered.connect(self.start_workout_clicked)
 
-        # self.listWidget_program.itemSelectionChanged.connect(self.tester)
+    def selection2attr(self):
+        theme = self.listWidget_theme.currentItem()
+        if theme:
+            tth_id = theme.data(user_role)
+            if tth_id in [m.tth_id for m in self.themes.model_list]:
+                self.current_tth_id = theme.data(user_role)
+            else:
+                raise ValueError('Theme list needs to be refreshed before storing the current tth')
+        else:
+            self.current_tth_id = None
+        program = self.listWidget_program.currentItem()
+        if program:
+            self.current_tpr_id = program.data(user_role)
+        else:
+            self.current_tpr_id = None
+        exercise = self.listWidget_exercise.currentItem()
+        if exercise:
+            self.current_tpe_id = exercise.data(user_role)
+        else:
+            self.current_tpe_id = None
 
-    def theme_list_refresh(self):
+    def theme_list_widget_refresh(self, new: bool = False):
         print('refreshing list')
-        # stmt = select(TrainingTheme).order_by(TrainingTheme.sequence).order_by(TrainingTheme.name)
-        # themes = self.db.read_stmt(stmt)
-        # themes = self.db.read_all(TrainingTheme)
-
-        # themes = self.read_themes()
-        # read from db and store them in a list
-        super().theme_list_refresh()
+        # store selected id
+        # self.selection2attr()
+        # refresh from the database
+        self.theme_list_refresh(new)
 
         # clear all lists
         self.listWidget_theme.clear()
         self.listWidget_program.clear()
         self.listWidget_exercise.clear()
 
-        for i, tth in enumerate(self.themes):
+        # insert themes and select the previous one
+        current_row = None
+        for i, tth in enumerate(self.themes.model_list):
             print(i, tth)
+            # ListWidget: Name and id
             self.listWidget_theme.insertItem(i, tth.name)
-            self.listWidget_theme.item(i).setData(user_role, tth)
+            self.listWidget_theme.item(i).setData(user_role, tth.tth_id)
+            if tth.tth_id == self.current_tth_id:
+                current_row = i
+        # set the current row
+        if isinstance(current_row, int):
+            self.listWidget_theme.setCurrentRow(current_row)
+
+        # refreshes the program list (based on the current_tth_id)
+        self.program_list_widget_refresh()
 
     def theme_moved(self):
         print('theme moved')
@@ -95,23 +122,31 @@ class MainWindow(SpeckWeg, QMainWindow, Ui_MainWindow_training):
         #     # tth.sequence = i + 1
         # self.db.update()
 
-        themes = [self.listWidget_theme.item(i).data(user_role)
-                  for i in range(self.listWidget_theme.count())]
+        # list of ids for the new ordering sequence
+        tth_ids = [self.listWidget_theme.item(i).data(user_role)
+                   for i in range(self.listWidget_theme.count())]
 
-        self.update_themes_sequence(themes)
+        # update the selection
+        self.selection2attr()
+        # store the sequence
+        self.update_themes_sequence(tth_ids)
 
-        self.program_list_refresh()
+        # refresh the list not necessary (should now be in the same order as self.themes.models
+
+        self.program_list_widget_refresh()
 
     def theme_list_clicked(self):
         theme = self.listWidget_theme.currentItem()
         print('Clicked on the program theme', theme.text())
 
-        self.program_list_refresh()
+        # update the selection
+        self.selection2attr()
+        # refresh programs
+        self.program_list_widget_refresh()
 
-    def theme_new(self):
+    def theme_new_clicked(self):
         print('new theme')
-        themes_row = self.listWidget_theme.currentRow()
-        n_themes = self.listWidget_theme.count()
+        n_themes = self.listWidget_theme.count()  # or len(self.themes.model_list
 
         dialog = ThemeDialog(parent=self, db=self.db, max_sequence=n_themes)
         dialog.exec()
@@ -119,156 +154,155 @@ class MainWindow(SpeckWeg, QMainWindow, Ui_MainWindow_training):
         # rejected handles escape-key, x and the close button (connected to reject()
         if dialog.rejected:
             print('closing dialog')
-            self.theme_list_refresh()
+            self.theme_list_widget_refresh(new=True)
 
-            # select a program
-            n_themes_new = self.listWidget_theme.count()
-
-            if n_themes_new > n_themes:
-                # a new one was added, set to last row
-                self.listWidget_theme.setCurrentRow(n_themes_new - 1)
-            elif themes_row != -1:
-                # no new one, a row was previously selected
-                self.listWidget_theme.setCurrentRow(themes_row)
-            else:
-                # no new one, none was selected
-                pass
-            self.program_list_refresh()
-
-    def theme_edit(self):
+    def theme_edit_clicked(self):
         print('edit theme')
         theme = self.listWidget_theme.currentItem()
-        row = self.listWidget_theme.currentRow()
+        # row = self.listWidget_theme.currentRow()
 
         if theme:
-            dialog = ThemeDialog(parent=self, db=self.db, obj=theme.data(user_role))
+            dialog = ThemeDialog(parent=self, db=self.db, tth_id=theme.data(user_role))
             dialog.exec()
 
             # rejected handles escape-key, x and the close button (connected to reject()
             if dialog.rejected:
-                self.theme_list_refresh()
-                # select the one as before
-                self.listWidget_theme.setCurrentRow(row)
-                self.program_list_refresh()
+                self.theme_list_widget_refresh()
 
-    def theme_delete(self):
+    def theme_delete_clicked(self):
         print('deleting theme')
         theme = self.listWidget_theme.currentItem()
         theme_row = self.listWidget_theme.currentRow()
 
         if theme:
-            self.db.delete(theme.data(user_role))
-            print('item deleted')
+            # self.db.delete(theme.data(user_role))
+            self.theme_delete()
+            print('item deleted in db')
+            self.listWidget_theme.takeItem(theme_row)
 
-            self.theme_list_refresh()
+            tth_ids = [self.listWidget_theme.item(i).data(user_role)
+                       for i in range(self.listWidget_theme.count())]
+            for i, tth_id in enumerate(tth_ids):
+                if tth_id == self.current_tth_id:
+                    self.listWidget_theme.setCurrentRow(i)
+            # print('item removed from gui')
+            # no refreshing -> refresh_list is overloaded with gui2app
 
             # select a theme
-            if theme_row < self.listWidget_theme.count():
-                self.listWidget_theme.setCurrentRow(theme_row)
-            else:
-                self.listWidget_theme.setCurrentRow(theme_row - 1)
-            self.program_list_refresh()
+            # if theme_row < self.listWidget_theme.count():
+            #     self.listWidget_theme.setCurrentRow(theme_row)
+            # else:
+            #     self.listWidget_theme.setCurrentRow(theme_row - 1)
+            self.program_list_widget_refresh()
 
         else:
             print('no item selected, none deleted')
 
-    def program_list_refresh(self):
+    def program_list_widget_refresh(self, new: bool = False):
         print('refreshing programs')
         self.listWidget_program.clear()
         self.listWidget_exercise.clear()
 
         # selected theme
+        # maybe delete, if working more with self.current_tth? maybe safer with listWidget?
         theme = self.listWidget_theme.currentItem()
 
         if theme:
-            tth = theme.data(user_role)
-            # read all programs from db related to the theme
-            # programs = self.db.read(TrainingProgram, TrainingProgram.tpr_tth_id, tth.tth_id)
+            self.program_list_refresh(new)
 
-            for i, tpr in enumerate(tth.training_programs):
+            # insert from the model list
+            current_row = None
+            for i, tpr in enumerate(self.programs.model_list):
+                print(i, tpr)
+                # ListWidget: Name and
                 self.listWidget_program.insertItem(i, tpr.name)
-                self.listWidget_program.item(i).setData(user_role, tpr)
+                self.listWidget_program.item(i).setData(user_role, tpr.tpr_id)
+                if tpr.tpr_id == self.current_tpr_id:
+                    current_row = i
+            # set the current row
+            if isinstance(current_row, int):
+                self.listWidget_program.setCurrentRow(current_row)
+        else:
+            # only for safety, should already be None from super().
+            self.current_tpr_id = None
+        print('programs updated')
+
+        self.exercise_list_widget_refresh()
 
     def program_moved(self):
         print('rows moved')
-        for i in range(self.listWidget_program.count()):
-            tpr = self.listWidget_program.item(i).data(user_role)
-            tpr.sequence = i + 1
-        self.db.update()
 
-        self.exercise_list_refresh()
+        # list of ids for the new ordering sequence
+        tpr_ids = [self.listWidget_program.item(i).data(user_role)
+                   for i in range(self.listWidget_program.count())]
+
+        # update the selection
+        self.selection2attr()
+        # store the sequence
+        self.update_program_sequence(tpr_ids)
+
+        # refresh the list not necessary (should now be in the same order as self.themes.models
+
+        self.exercise_list_widget_refresh()
 
     def program_clicked(self):
         program = self.listWidget_program.currentItem()
         print('Clicked on the program list', program.text())
 
-        self.exercise_list_refresh()
+        # update the selection
+        self.selection2attr()
 
-    def program_new(self):
+        # refresh the exercises
+        self.exercise_list_widget_refresh()
+
+    def program_new_clicked(self):
         theme = self.listWidget_theme.currentItem()
-        program_row = self.listWidget_program.currentRow()
-        n_programs = self.listWidget_program.count()
+        n_programs = self.listWidget_program.count()  # or len(self.programs.model_list)
 
         if theme:
-            dialog = ProgramDialog(parent=self, db=self.db, parent_tth=theme.data(user_role))
+            dialog = ProgramDialog(parent=self, db=self.db, tpr_tth_id=theme.data(user_role),
+                                   max_sequence=n_programs)
             dialog.exec()
 
             # rejected handles escape-key, x and the close button (connected to reject()
             if dialog.rejected:
-                self.program_list_refresh()
+                self.program_list_widget_refresh(new=True)
 
-                # select a program
-                n_programs_new = self.listWidget_program.count()
-
-                if n_programs_new > n_programs:
-                    # a new one was added, set to last row
-                    self.listWidget_program.setCurrentRow(n_programs_new - 1)
-                elif program_row != -1:
-                    # no new one, a row was previously selected
-                    self.listWidget_program.setCurrentRow(program_row)
-                else:
-                    # no new one, none was selected
-                    pass
-                self.exercise_list_refresh()
-
-    def program_edit(self):
+    def program_edit_clicked(self):
         theme = self.listWidget_theme.currentItem()
         program = self.listWidget_program.currentItem()
-        row = self.listWidget_theme.currentRow()
 
-        if program:
-            dialog = ProgramDialog(parent=self, db=self.db,
-                                   obj=program.data(user_role), parent_tth=theme.data(user_role))
+        if program and theme:
+            dialog = ProgramDialog(parent=self, db=self.db, tpr_tth_id=theme.data(user_role),
+                                   tpr_id=program.data(user_role))
             dialog.exec()
 
             # rejected handles escape-key, x and the close button (connected to reject()
             if dialog.rejected:
-                self.program_list_refresh()
-                # select the one as before
-                self.listWidget_program.setCurrentRow(row)
-                self.exercise_list_refresh()
+                self.program_list_widget_refresh()
 
-    def program_delete(self):
+    def program_delete_clicked(self):
         print('deleting program')
         program = self.listWidget_program.currentItem()
         program_row = self.listWidget_program.currentRow()
 
         if program:
-            self.db.delete(program.data(user_role))
+            self.program_delete()
             print('item deleted')
-            self.program_list_refresh()
+            self.listWidget_program.takeItem(program_row)
 
-            if program_row < self.listWidget_program.count():
-                self.listWidget_program.setCurrentRow(program_row)
-            else:
-                self.listWidget_program.setCurrentRow(program_row - 1)
+            tpr_ids = [self.listWidget_program.item(i).data(user_role)
+                       for i in range(self.listWidget_program.count())]
+            for i, tpr_id in enumerate(tpr_ids):
+                if tpr_id == self.current_tpr_id:
+                    self.listWidget_program.setCurrentRow(i)
 
-            self.exercise_list_refresh()
+            self.exercise_list_widget_refresh()
 
         else:
             print('no item selected, none deleted')
 
-    def exercise_list_refresh(self):
+    def exercise_list_widget_refresh(self, new: bool = False):
         print('refreshing exercises')
         self.listWidget_exercise.clear()
 
@@ -277,109 +311,126 @@ class MainWindow(SpeckWeg, QMainWindow, Ui_MainWindow_training):
 
         if program:
             print('refresh exercises for the selected program', program.text())
-            tpr = program.data(user_role)
+            self.exercise_list_refresh(new)
 
-            for i, tpe in enumerate(tpr.training_exercises):
+            # insert from the model list
+            current_row = None
+            for i, tpe in enumerate(self.exercises.model_list):
+                print(i, tpe)
                 self.listWidget_exercise.insertItem(i, tpe.training_exercise.name)
-                self.listWidget_exercise.item(i).setData(user_role, tpe.training_exercise)
+                self.listWidget_exercise.item(i).setData(user_role, tpe.tpe_id)
+                print(self.current_tpe_id, tpe.tpe_id)
+                if tpe.tpe_id == self.current_tpe_id:
+                    current_row = i
+                    print('current row', current_row)
+            # set the current row
+            if isinstance(current_row, int):
+                self.listWidget_exercise.setCurrentRow(current_row)
+        else:
+            # only for safety, should already be None from super().
+            self.current_tpr_id = None
             print('refresh done')
 
     def exercise_moved(self):
         print('exercise moved')
 
-        program = self.listWidget_program.currentItem()
-        if program:  # should always be true (no program selected, no exercise displayed)
-            tpr = program.data(user_role)
-            for i in range(self.listWidget_exercise.count()):
-                tex = self.listWidget_exercise.item(i).data(user_role)
-                # select the association object to the tex
-                tpe = [
-                    tpe for tpe in tpr.training_exercises if tpe.tpe_tex_id == tex.tex_id
-                ][0]
-                tpe.sequence = i + 1
-            self.db.update()
+        # list of ids for the new ordering sequence
+        tpe_ids = [self.listWidget_exercise.item(i).data(user_role)
+                   for i in range(self.listWidget_exercise.count())]
 
-    def exercise_new(self):
+        # update the selection
+        self.selection2attr()
+        # store the sequence
+        self.update_exercise_sequence(tpe_ids)
+
+        # refresh the list not necessary (should now be in the same order as self.themes.models
+
+    def exercise_clicked(self):
+        # update the selection
+        self.selection2attr()
+
+    def exercise_new_clicked(self):
         print('new exercise')
         program = self.listWidget_program.currentItem()
-        exercise_row = self.listWidget_exercise.currentRow()
         n_exercises = self.listWidget_exercise.count()
 
         if program:
             print('opening dialog')
-            dialog = ExerciseDialog(parent=self, db=self.db, parent_tpr=program.data(user_role),
-                                    usr=self.user.usr)
+            dialog = ExerciseDialog(parent=self, db=self.db, usr_id=self.user.model.usr_id,
+                                    tpr_id=program.data(user_role), max_sequence=n_exercises)
             dialog.exec()
 
             # rejected handles escape-key, x and the close button (connected to reject()
             if dialog.rejected:
-                self.exercise_list_refresh()
-                n_exercises_new = self.listWidget_exercise.count()
+                self.exercise_list_widget_refresh(new=True)
 
-                # select an exercise
-                if n_exercises_new > n_exercises:
-                    # a new one was added, set to last row
-                    self.listWidget_exercise.setCurrentRow(n_exercises_new - 1)
-                elif exercise_row != -1:
-                    # no new one, a row was previously selected
-                    self.listWidget_exercise.setCurrentRow(exercise_row)
-                else:
-                    # no new one, none was selected
-                    pass
-
-    def exercise_edit(self):
+    def exercise_edit_clicked(self):
         program = self.listWidget_program.currentItem()
         exercise = self.listWidget_exercise.currentItem()
-        row = self.listWidget_exercise.currentRow()
 
-        if exercise:
+        if exercise and program:
             print('exercise selected')
-            dialog = ExerciseDialog(parent=self, db=self.db,
-                                    obj=exercise.data(user_role),
-                                    parent_tpr=program.data(user_role),
-                                    usr=self.user.usr)
+            # get the tex_id from the tpe model
+            tpe_id = exercise.data(user_role)
+            tpe = next(tpe for tpe in self.exercises.model_list if tpe.tpe_id == tpe_id)
+            dialog = ExerciseDialog(parent=self, db=self.db, usr_id=self.user.model.usr_id,
+                                    tpr_id=program.data(user_role),
+                                    tex_id=tpe.training_exercise.tex_id)
             print('starting dialog')
             dialog.exec()
 
             # rejected handles escape-key, x and the close button (connected to reject()
             if dialog.rejected:
-                self.exercise_list_refresh()
-                # select
-                self.listWidget_exercise.setCurrentRow(row)
+                self.exercise_list_widget_refresh()
 
-    def exercise_delete(self):
+    def exercise_delete_clicked(self):
         print('deleting exercise')
         exercise = self.listWidget_exercise.currentItem()
         exercise_row = self.listWidget_exercise.currentRow()
 
         if exercise:
-            self.db.delete(exercise.data(user_role))
-            print('item deleted')
+            tex = next(tpe.training_exercise
+                       for tpe in self.exercises.model_list
+                       if tpe.tpe_id == self.current_tpe_id)
+            last_exercise = self.exercises.check_for_last_exercise(tex.tex_id)
+            print(tex, last_exercise)
+            delete = True
+            if last_exercise:
+                message = self.messages['delete_exercise']
+                clicked = open_message_box(message)
+                if not clicked:
+                    delete = False
+
+            if delete:
+                self.exercise_delete()
+                print('item deleted')
+                self.listWidget_exercise.takeItem(exercise_row)
+
+                tpe_ids = [self.listWidget_exercise.item(i).data(user_role)
+                           for i in range(self.listWidget_exercise.count())]
+                for i, tpe_id in enumerate(tpe_ids):
+                    if tpe_id == self.current_tpe_id:
+                        self.listWidget_program.setCurrentRow(i)
+
         else:
             print('no item selected, none deleted')
 
-        self.exercise_list_refresh()
-        # select
-        if exercise_row < self.listWidget_exercise.count():
-            self.listWidget_exercise.setCurrentRow(exercise_row)
-        else:
-            self.listWidget_exercise.setCurrentRow(exercise_row - 1)
+    def edit_user_clicked(self):
+        print('editing user data', self.user.model)
 
-    def edit_user(self):
-        print('editing user data', self.user.usr)
-
-        dialog = UserDialog(db=self.db, parent=self, obj=self.user.usr)
+        dialog = UserDialog(db=self.db, parent=self, usr_id=self.user.model.usr_id)
         dialog.exec()
 
-        # There must be one user in the database -> read again
-        self.user.read_current_user()
+        if dialog.rejected:
+            # There must be one user in the database -> read again
+            self.user.read_current_user()
 
-        if self.user.usr:
-            self.action_start_workout.setEnabled(True)
-        else:
-            self.action_start_workout.setEnabled(False)
+            if self.user.model:
+                self.action_start_workout.setEnabled(True)
+            else:
+                self.action_start_workout.setEnabled(False)
 
-    def start_workout(self):
+    def start_workout_clicked(self):
         print('starting the workout dialog')
 
         program = self.listWidget_program.currentItem()
@@ -392,5 +443,5 @@ class MainWindow(SpeckWeg, QMainWindow, Ui_MainWindow_training):
         else:
             open_message_box(self.messages['no_program_selected'])
 
-    def about(self):
+    def about_clicked(self):
         open_message_box(self.messages['about'])

@@ -74,13 +74,26 @@ class CRUD:
 
         return res
 
+    def read_one(self, stmt, unique=False) -> Any:
+        # error, if it cant find the tuple
+        try:
+            if unique:
+                res = self.session.execute(stmt).scalars().unique().one()
+            else:
+                res = self.session.execute(stmt).scalars().one()
+        except Exception as exc:
+            print(exc)
+            raise exc
+
+        return res
+
     def read_all(self, cls: Type['DeclarativeMeta']) -> List[Any]:
 
         stmt = select(cls)
 
         # without scalars --> rows with lists of obj
         try:
-            res = self.session.execute(stmt).scalars()
+            res = list(self.session.execute(stmt).scalars())
         except Exception as exc:
             print(exc)
             raise exc
@@ -109,8 +122,10 @@ class CRUD:
 
         return res
 
-    def update(self):
+    def update(self, stmt=None, payload=None):
         # commit recent changes
+        if stmt != None:
+            self.session.execute(stmt, payload)
         self.session.commit()
 
     def delete(self, obj: Union[List, 'DeclarativeMeta']):

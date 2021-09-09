@@ -9,8 +9,7 @@ from typing import TYPE_CHECKING
 from PyQt5.QtWidgets import QDialog
 
 from .dialog_user_ui import Ui_Dialog_user
-from ..models import UserModel
-from ..app.app import User
+from ..app import User
 
 if TYPE_CHECKING:
     from ..db import CRUD
@@ -18,15 +17,15 @@ if TYPE_CHECKING:
 
 class UserDialog(User, QDialog, Ui_Dialog_user):
 
-    def __init__(self, db: 'CRUD', obj: 'UserModel' = None, parent=None):
-        super().__init__(db=db, obj=obj, parent=parent)
+    def __init__(self, db: 'CRUD', usr_id: int = None, parent=None):
+        super().__init__(db=db, usr_id=usr_id, parent=parent)
         print('user')
 
         self.setupUi(self)
         self.connect()
 
-        if self.usr:
-            print('yay, usr', self.usr)
+        if self.model:
+            print('yay, usr', self.model)
             self.update_widgets()
         else:
             print('no usr')
@@ -63,5 +62,5 @@ class UserDialog(User, QDialog, Ui_Dialog_user):
         self.update_widgets()
 
     def update_widgets(self):
-        self.lineEdit_name.setText(self.usr.name)
-        self.doubleSpinBox_weight.setValue(self.usr.weight)
+        self.lineEdit_name.setText(self.model.name)
+        self.doubleSpinBox_weight.setValue(self.model.weight)

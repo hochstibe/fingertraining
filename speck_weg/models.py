@@ -67,7 +67,7 @@ class TrainingProgramModel(Base):
 
     def __repr__(self):
         return f'TrainingProgramModel(' \
-               f'tpr_id={self.tth_id!r}, name={self.name!r})'
+               f'tpr_id={self.tpr_id!r}, name={self.name!r})'
 
 
 class TrainingExerciseModel(Base):
@@ -76,7 +76,6 @@ class TrainingExerciseModel(Base):
     # No unique constraint: Multiple exercises with the same name possible (2x half crimp big)
 
     tex_id = Column(Integer, primary_key=True, autoincrement='auto')
-    # tex_usr_id is referenced, if the body weight is relevan
     tex_usr_id = Column(Integer, ForeignKey('user.usr_id'), nullable=True)
     name = Column(String(63), nullable=False)
     description = Column(String(1023), nullable=True)
@@ -100,18 +99,21 @@ class TrainingExerciseModel(Base):
 class TrainingProgramExerciseModel(Base):
     # table definitions
     __tablename__ = 'training_program_exercise'
+    # Todo: UniqueConstraint on the previous pk-columns (tpr_id, tex_id, sequence)?
 
-    tpe_tpr_id = Column(ForeignKey('training_program.tpr_id'), primary_key=True, nullable=False)
-    tpe_tex_id = Column(ForeignKey('training_exercise.tex_id'), primary_key=True, nullable=False)
-    sequence = Column(Integer, primary_key=True, nullable=False)
+    tpe_id = Column(Integer, primary_key=True, autoincrement='auto')
+    tpe_tpr_id = Column(ForeignKey('training_program.tpr_id'), nullable=False)
+    tpe_tex_id = Column(ForeignKey('training_exercise.tex_id'), nullable=False)
+    sequence = Column(Integer, nullable=False)
 
     # orm definitions
     training_program = relationship('TrainingProgramModel', back_populates='training_exercises')
-    training_exercise = relationship('TrainingExerciseModel', back_populates='training_programs',)
+    training_exercise = relationship('TrainingExerciseModel', back_populates='training_programs')
 
     def __repr__(self):
-        return f'TrainingProgramExerciseModel(wse_tpe_tpr_id=({self.tpe_tpr_id!r}, ' \
-               f'tpe_tex_id={self.tpe_tex_id}, sequence={self.sequence})'
+        return f'TrainingProgramExerciseModel(tpe_id={self.tpe_id}, ' \
+               f'tpe_tpr_id=({self.tpe_tpr_id!r}, tpe_tex_id={self.tpe_tex_id}, ' \
+               f'sequence={self.sequence})'
 
 
 class WorkoutSessionModel(Base):

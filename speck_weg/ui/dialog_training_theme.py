@@ -3,36 +3,28 @@
 # Folder: speck_weg/ui File: dialog_training_theme.py
 #
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from PyQt5.QtWidgets import QDialog
 
-from ..models import TrainingThemeModel
 from .dialog_training_theme_ui import Ui_Dialog_training_theme
+from ..app import TrainingTheme
 
 if TYPE_CHECKING:
     from ..db import CRUD
 
 
-class ThemeDialog(QDialog, Ui_Dialog_training_theme):
+class ThemeDialog(TrainingTheme, QDialog, Ui_Dialog_training_theme):
 
-    def __init__(self, db: 'CRUD', parent=None, obj: 'TrainingThemeModel' = None,
-                 max_sequence=None):
-        super().__init__(parent)
+    def __init__(self, db: 'CRUD', tth_id: int = None, max_sequence=None,
+                 parent=None):
+        super().__init__(db=db, tth_id=tth_id, max_sequence=max_sequence, parent=parent)
         print('init theme')
-
-        self.db = db
-
-        self.tth: Optional['TrainingThemeModel'] = obj
-        self.max_sequence: int = max_sequence
 
         self.setupUi(self)
         self.connect()
 
-        if self.tth:
-            # editing
-            self.lineEdit_name.setText(self.tth.name)
-            self.textEdit_description.setText(self.tth.description)
+        self.update_widgets()
 
     def connect(self):
         """
@@ -43,27 +35,26 @@ class ThemeDialog(QDialog, Ui_Dialog_training_theme):
 
     def save(self):
 
-        if self.tth:
+        if self.model:
             # editing the existing object
-            self.tth.name = self.lineEdit_name.text()
-            self.tth.description = self.textEdit_description.toPlainText()
-
-            self.db.update()
+            self.edit_theme(self.lineEdit_name.text(), self.textEdit_description.toPlainText())
             print('theme updated')
 
         else:
             # Return the object, add to the db from main window
-            self.tth = TrainingThemeModel(
-                name=self.lineEdit_name.text(),
-                description=self.textEdit_description.toPlainText(),
-                sequence=self.max_sequence + 1,
-            )
-            self.db.create(self.tth)
-            self.max_sequence += 1
+            self.add_theme(self.lineEdit_name.text(), self.textEdit_description.toPlainText())
             print('theme added to the database')
 
-            # Clear after saving for adding a new one
-            self.tth = None
+            self.update_widgets()
+
+    def update_widgets(self):
+        # updates the widgets from the model
+        if self.model:
+            # editing -> get values from model
+            self.lineEdit_name.setText(self.model.name)
+            self.textEdit_description.setText(self.model.description)
+        else:
+            # No model -> clear fields
             self.lineEdit_name.clear()
             self.textEdit_description.clear()
             # Reset the focus on the first lineEdit
