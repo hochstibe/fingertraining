@@ -3,15 +3,14 @@
 # Folder: speck_weg/ui File: dialog_training_exercise.py
 #
 
-
 from typing import TYPE_CHECKING, Dict
 
 from PyQt5.QtWidgets import QDialog
 import PyQt5.QtCore
 
-from ..app import TrainingExercise
 from .dialog_training_exercise_ui import Ui_Dialog_training_exercise
 from .dialog_training_exercise_load import ExerciseLoadDialog
+from ..app import TrainingExercise
 
 if TYPE_CHECKING:
     from ..db import CRUD
@@ -23,8 +22,7 @@ user_role = PyQt5.QtCore.Qt.UserRole
 class ExerciseDialog(TrainingExercise, QDialog, Ui_Dialog_training_exercise):
 
     def __init__(self, db: 'CRUD', usr_id: int, tpr_id: int,
-                 tex_id: int = None, max_sequence: int = None,
-                 parent=None):
+                 tex_id: int = None, parent=None):
         super().__init__(db=db, usr_id=usr_id, tpr_id=tpr_id,
                          tex_id=tex_id, parent=parent)
 

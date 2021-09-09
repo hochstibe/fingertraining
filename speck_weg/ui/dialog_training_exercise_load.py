@@ -8,8 +8,8 @@ from typing import TYPE_CHECKING
 from PyQt5.QtWidgets import QDialog
 import PyQt5.QtCore
 
-from ..app import TrainingExerciseCollection
 from .dialog_training_exercise_load_ui import Ui_Dialog_training_exercise_load
+from ..app import TrainingExerciseCollection
 
 if TYPE_CHECKING:
     from ..db import CRUD
@@ -19,9 +19,6 @@ user_role = PyQt5.QtCore.Qt.UserRole
 
 
 class ExerciseLoadDialog(TrainingExerciseCollection, QDialog, Ui_Dialog_training_exercise_load):
-
-    # tex: Optional['TrainingExercise'] = None
-    # max_sequence: int = 0  # ordering sequence for the exercises, starting from 1
 
     def __init__(self, db: 'CRUD', tpr_id: int, usr_id: int,
                  parent=None):

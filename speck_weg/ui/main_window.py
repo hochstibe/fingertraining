@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import QMainWindow
 from . import ThemeDialog, ProgramDialog, ExerciseDialog, WorkoutDialog, UserDialog
 from .messages import open_message_box
 from .main_window_ui import Ui_MainWindow_training
-from ..app import SpeckWeg
+from ..app.app import SpeckWeg
 
 if TYPE_CHECKING:
     from ..db import CRUD
@@ -352,12 +352,11 @@ class MainWindow(SpeckWeg, QMainWindow, Ui_MainWindow_training):
     def exercise_new_clicked(self):
         print('new exercise')
         program = self.listWidget_program.currentItem()
-        n_exercises = self.listWidget_exercise.count()
 
         if program:
             print('opening dialog')
             dialog = ExerciseDialog(parent=self, db=self.db, usr_id=self.user.model.usr_id,
-                                    tpr_id=program.data(user_role), max_sequence=n_exercises)
+                                    tpr_id=program.data(user_role))
             dialog.exec()
 
             # rejected handles escape-key, x and the close button (connected to reject()
@@ -393,27 +392,22 @@ class MainWindow(SpeckWeg, QMainWindow, Ui_MainWindow_training):
                        for tpe in self.exercises.model_list
                        if tpe.tpe_id == self.current_tpe_id)
             last_exercise = self.exercises.check_for_last_exercise(tex.tex_id)
-            print(tex, last_exercise)
-            delete = True
+
+            delete_child = False
             if last_exercise:
                 message = self.messages['delete_exercise']
                 clicked = open_message_box(message)
-                if not clicked:
-                    delete = False
+                if clicked:
+                    delete_child = True
 
-            if delete:
-                self.exercise_delete()
-                print('item deleted')
-                self.listWidget_exercise.takeItem(exercise_row)
+            self.exercise_delete(delete_child)
+            self.listWidget_exercise.takeItem(exercise_row)
 
-                tpe_ids = [self.listWidget_exercise.item(i).data(user_role)
-                           for i in range(self.listWidget_exercise.count())]
-                for i, tpe_id in enumerate(tpe_ids):
-                    if tpe_id == self.current_tpe_id:
-                        self.listWidget_program.setCurrentRow(i)
-
-        else:
-            print('no item selected, none deleted')
+            tpe_ids = [self.listWidget_exercise.item(i).data(user_role)
+                       for i in range(self.listWidget_exercise.count())]
+            for i, tpe_id in enumerate(tpe_ids):
+                if tpe_id == self.current_tpe_id:
+                    self.listWidget_program.setCurrentRow(i)
 
     def edit_user_clicked(self):
         print('editing user data', self.user.model)

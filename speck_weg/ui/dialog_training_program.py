@@ -8,8 +8,8 @@ from typing import TYPE_CHECKING
 from PyQt5.QtWidgets import QDialog
 import PyQt5.QtCore
 
-from ..app import TrainingProgram
 from .dialog_training_program_ui import Ui_Dialog_training_program
+from ..app import TrainingProgram
 
 if TYPE_CHECKING:
     from ..db import CRUD

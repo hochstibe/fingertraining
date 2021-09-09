@@ -124,7 +124,7 @@ class CRUD:
 
     def update(self, stmt=None, payload=None):
         # commit recent changes
-        if stmt != None:
+        if stmt is not None:
             self.session.execute(stmt, payload)
         self.session.commit()
 
