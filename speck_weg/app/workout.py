@@ -9,11 +9,12 @@ from sqlalchemy import select
 
 from .app import Message
 from ..db import CRUD
-from ..models import TrainingProgramModel, TrainingExerciseModel, WorkoutSessionModel, WorkoutExerciseModel, UserModel
+from ..models import (TrainingProgramModel, TrainingExerciseModel,
+                      WorkoutSessionModel, WorkoutExerciseModel, UserModel)
 
 
 class Workout:
-    def __init__(self, db: 'CRUD', parent_tpr: 'TrainingProgramModel',
+    def __init__(self, db: 'CRUD', parent_tpr_id: int,
                  obj: 'WorkoutSessionModel' = None, **kwargs):
         # Additional arguments are passed to next inheritance
         super().__init__(**kwargs)
@@ -21,7 +22,8 @@ class Workout:
         self.db = db
 
         self.wse: Optional['WorkoutSessionModel'] = obj
-        self.parent_tpr: 'TrainingProgramModel' = parent_tpr
+        stmt = select(TrainingProgramModel).where(TrainingProgramModel.tpr_id == parent_tpr_id)
+        self.parent_tpr: 'TrainingProgramModel' = self.db.read_one(stmt)
         # List of [planned exercise, [logged sets of the exercise]]
         self.exercises: List[List['TrainingExerciseModel', List[Optional[WorkoutExerciseModel]]]] = []
 

@@ -430,7 +430,7 @@ class MainWindow(SpeckWeg, QMainWindow, Ui_MainWindow_training):
         program = self.listWidget_program.currentItem()
 
         if program:
-            dialog = WorkoutDialog(db=self.db, parent=self, parent_tpr=program.data(user_role))
+            dialog = WorkoutDialog(db=self.db, parent=self, parent_tpr_id=program.data(user_role))
 
             dialog.exec()
 

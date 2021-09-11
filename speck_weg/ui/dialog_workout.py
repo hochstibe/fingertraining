@@ -20,13 +20,13 @@ class WorkoutDialog(Workout, QDialog, Ui_Dialog_workout):
 
     def __init__(self,
                  # Workout
-                 db: 'CRUD', parent_tpr: 'TrainingProgramModel', obj: 'WorkoutSessionModel' = None,
+                 db: 'CRUD', parent_tpr_id: int, obj: 'WorkoutSessionModel' = None,
                  # Qdialog
                  parent=None,
                  ):
         # With super, the arguments for the QDialog (second inheritance)
         # must be passed in the __init__ function of Workout (first inheritance)
-        super().__init__(db=db, parent_tpr=parent_tpr, obj=obj,
+        super().__init__(db=db, parent_tpr_id=parent_tpr_id, obj=obj,
                          parent=parent)
 
         # Workout is initialized, if a user is missing, open messagebox

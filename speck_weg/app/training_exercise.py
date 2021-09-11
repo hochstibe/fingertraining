@@ -53,7 +53,7 @@ class TrainingProgramExerciseCollection:
             tpe = self.model_list.pop(idx)
             tpr_id = tpe.tpe_tpr_id
             if child:
-                self.db.delete([tpe, tpe.training_exercise])
+                self.db.delete([tpe.training_exercise, tpe])
             else:
                 self.db.delete(tpe)
 

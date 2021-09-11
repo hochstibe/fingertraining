@@ -83,6 +83,7 @@ class TrainingExerciseModel(Base):
     baseline_repetitions = Column(Integer, nullable=False)
     baseline_weight = Column(Float, nullable=True)
     baseline_duration = Column(Float, nullable=True)
+    # Todo: Duration in seconds --> Int probably better than float
 
     # orm definitions
     training_programs = relationship('TrainingProgramExerciseModel',
