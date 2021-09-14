@@ -67,6 +67,10 @@ class SpeckWeg:
         # default messages
         self.messages: Dict[str, 'Message'] = dict()
 
+        title = 'Kein User vorhanden.'
+        text = 'Bitte zuerst einen User erstellen.'
+        self.messages['no_user'] = Message(title, text, 'information')
+
         title = 'Übung löschen'
         text = 'Willst du die Übung wirklich löschen?'
         self.messages['delete_exercise'] = Message(title, text, 'question',

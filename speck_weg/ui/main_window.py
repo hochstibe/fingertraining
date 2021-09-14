@@ -430,9 +430,15 @@ class MainWindow(SpeckWeg, QMainWindow, Ui_MainWindow_training):
         program = self.listWidget_program.currentItem()
 
         if program:
-            dialog = WorkoutDialog(db=self.db, parent=self, parent_tpr_id=program.data(user_role))
 
-            dialog.exec()
+            if self.user:
+                # Start the workout dialog
+                dialog = WorkoutDialog(db=self.db, parent=self, tpr_id=program.data(user_role))
+                dialog.exec()
+            else:
+                # not possible without a user
+                message = self.messages['no_user']
+                open_message_box(message)
 
         else:
             open_message_box(self.messages['no_program_selected'])

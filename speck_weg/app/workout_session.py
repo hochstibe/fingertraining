@@ -6,6 +6,7 @@
 from typing import Tuple, Optional, TYPE_CHECKING
 
 from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 
 from .workout_exercise import WorkoutExerciseSet
 from ..models import (TrainingProgramModel, WorkoutSessionModel)
@@ -23,7 +24,7 @@ class WorkoutSession:
         self.db = db
 
         # read the objects from the database
-
+        self.model = None
         self.tpr_model, self.model = self.read_objects(tpr_id, wse_id)
 
         if not self.model:
@@ -34,7 +35,7 @@ class WorkoutSession:
         # self.exercises: List[Tuple['TrainingExerciseModel',
         #                            List[Optional[WorkoutExercise]]]] = []
         # Generate a list for all exercises (pairs for planned an done exercises)
-        self.exercises = [WorkoutExerciseSet(db, wse_id, tpe.tpe_tex_id)
+        self.exercises = [WorkoutExerciseSet(db, self.model.wse_id, tpe.tpe_tex_id)
                           for tpe in self.tpr_model.training_exercises]
 
         # for tpe in self.tpr_model.training_exercises:
@@ -42,12 +43,24 @@ class WorkoutSession:
         #       (tpe.training_exercise, [None for _ in range(tpe.training_exercise.baseline_sets)])
         #     )
 
+    @property
+    def wex_saved(self):
+        wex_models = [wex for wex_set in self.exercises
+                      for wex in wex_set.wex_model_list]
+        if any(wex_models):
+            return True
+        else:
+            return False
+
     def read_objects(self, tpr_id: int = None, wse_id: int = None
                      ) -> Tuple['TrainingProgramModel', Optional['WorkoutSessionModel']]:
         # Parent
         if not tpr_id:
             tpr_id = self.tpr_model.tpr_id
-        stmt = select(TrainingProgramModel).where(TrainingProgramModel.tpr_id == tpr_id)
+        # also load the training theme (name is needed for the gui
+        stmt = select(TrainingProgramModel).where(TrainingProgramModel.tpr_id == tpr_id).options(
+            joinedload(TrainingProgramModel.training_theme, innerjoin=True)
+        )
         parent_model = self.db.read_one(stmt)
 
         if not wse_id:

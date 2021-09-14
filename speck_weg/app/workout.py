@@ -1,38 +1,29 @@
 # fingertraining
-# Stefan Hochuli, 31.08.2021,
+# Stefan Hochuli, 10.09.2021,
 # Folder: speck_weg/app File: workout.py
 #
 
-from typing import List, Optional, Union, Tuple, Dict
-
-from sqlalchemy import select
+from typing import Optional, Union, Dict, Tuple, TYPE_CHECKING
 
 from .app import Message
 from ..db import CRUD
-from ..models import (TrainingProgramModel, TrainingExerciseModel,
-                      WorkoutSessionModel, WorkoutExerciseModel, UserModel)
+from .workout_session import WorkoutSession
+
+if TYPE_CHECKING:
+    from .workout_exercise import WorkoutExerciseSet
+    from ..models import TrainingExerciseModel, WorkoutExerciseModel
 
 
 class Workout:
-    def __init__(self, db: 'CRUD', parent_tpr_id: int,
-                 obj: 'WorkoutSessionModel' = None, **kwargs):
+    def __init__(self, db: 'CRUD', tpr_id: int,
+                 wse_id: int = None, **kwargs):
         # Additional arguments are passed to next inheritance
         super().__init__(**kwargs)
 
-        self.db = db
-
-        self.wse: Optional['WorkoutSessionModel'] = obj
-        stmt = select(TrainingProgramModel).where(TrainingProgramModel.tpr_id == parent_tpr_id)
-        self.parent_tpr: 'TrainingProgramModel' = self.db.read_one(stmt)
-        # List of [planned exercise, [logged sets of the exercise]]
-        self.exercises: List[List['TrainingExerciseModel', List[Optional[WorkoutExerciseModel]]]] = []
+        self.workout_session = WorkoutSession(db, tpr_id, wse_id)
 
         # default messages
         self.messages: Dict[str, 'Message'] = dict()
-
-        title = 'Kein User vorhanden.'
-        text = 'Bitte zuerst einen User erstellen.'
-        self.messages['no_user'] = Message(title, text, 'information')
 
         title = 'Session löschen'
         text = 'Die Session wird geschlossen und gelöscht. ' \
@@ -40,169 +31,113 @@ class Workout:
         self.messages['delete_session'] = Message(title, text, 'question',
                                                   button_accept_name='Löschen')
 
-        # Get the current user
-        stmt = select(UserModel)
-        self.usr: 'UserModel' = self.db.read_first(stmt)
-
         # Set the starting position
-        self.current_pos: int = -1
-        self.current_set: int = -1
-        # Default values for the current exercise (start / end -> None)
-        self.baseline_weight: Optional[float] = None
-        self.baseline_duration: Optional[float] = None
-
-        if self.wse:
-            # edit mode
-            pass
-        else:
-            # new mode
-            self.wse = WorkoutSessionModel(wse_tpr_id=self.parent_tpr.tpr_id)
-            self.db.create(self.wse)
-
-        # Generate a list for all exercises (pairs for planned an done exercises)
-        self.exercises = [
-            [tpe.training_exercise, [None for _ in range(tpe.training_exercise.baseline_sets)]]
-            for tpe in self.parent_tpr.training_exercises
-        ]
+        # both, the position and the set equals the position in the respective list
+        # in the database, the values start with 1
+        # --> always add +1 for persisting the position or set in the database
+        self.current_pos: int = -1  # position in WorkoutSession.exercises
+        self.current_set: int = -1  # position in WorkoutExerciseSet.wex_model_list
 
     @property
-    def current_exercise(self) -> Union[
-        Tuple[
-            'TrainingExerciseModel',
-            Optional['WorkoutExerciseModel']
-        ],
-        None
-    ]:
-        """
-        :return: Current TrainingExercise,  current WorkoutExercise (if already saved)
-        """
-        if self.current_pos in range(len(self.exercises)):
-            tex, wexes = self.exercises[self.current_pos]
-            wex = wexes[self.current_set - 1]
-            print(tex, wex)
-            return tex, wex
+    def current_exercise_set(self) -> Union['WorkoutExerciseSet', None]:
+        if self.current_pos in range(len(self.workout_session.exercises)):
+            return self.workout_session.exercises[self.current_pos]
         else:
-            print('out of range', self.current_pos, len(self.exercises))
+            print('out of range', self.current_pos, len(self.workout_session.exercises))
             return None
 
-    @current_exercise.setter
-    def current_exercise(self, wex: 'WorkoutExerciseModel'):
-        if self.current_pos in range(len(self.exercises)):
-            tex, wexes = self.exercises[self.current_pos]
-            wexes[self.current_set - 1] = wex
-
-    def save(self, repetitions: int, weight: float, duration: int, comment: str):
-        if self.current_pos == -1 or self.current_pos == len(self.exercises):
-            # start / stop
-            self.save_session(comment)
+    @property
+    def current_tex_wex(self) -> Tuple['TrainingExerciseModel', Optional['WorkoutExerciseModel']]:
+        if self.current_pos in range(len(self.workout_session.exercises)):
+            current_exercise_set = self.workout_session.exercises[self.current_pos]
+            tex = current_exercise_set.tex_model
+            wex = current_exercise_set.wex_model_list[self.current_set]
+            return tex, wex
         else:
-            self.save_exercise(repetitions, weight, duration, comment)
+            raise ValueError('No current exercise (start or end position)')
+
+    @property
+    def start_position(self) -> bool:
+        # If it is the start position -> True
+        if self.current_pos == -1:
+            return True
+        else:
+            return False
+
+    @property
+    def end_position(self) -> bool:
+        if self.current_pos == len(self.workout_session.exercises):
+            return True
+        else:
+            return False
+
+    def save(self, comment: str,  # comment is for both: session and exercise
+             repetitions: int = None,
+             weight: float = None, duration: float = None):
+        # all attributes from the widgets are given -> not necessary for the session...
+        if self.current_pos == -1 or self.current_pos == len(self.workout_session.exercises):
+            # start / stop
+            self.workout_session.edit_session(comment)
+        else:
+            if self.current_exercise_set.wex_model_list[self.current_set]:
+                # edit the model
+                self.current_exercise_set.edit_exercise(
+                    n_set=self.current_set,   # only for accessing the exercise
+                    repetitions=repetitions, weight=weight,
+                    duration=duration, comment=comment
+                )
+            else:
+                # new model
+                # the position equals the sequence in the tpe
+                self.current_exercise_set.add_exercise(
+                    sequence=self.current_pos + 1, n_set=self.current_set,
+                    repetitions=repetitions, weight=weight,
+                    duration=duration, comment=comment
+                )
 
     def delete(self):
-        if self.current_pos == -1 or self.current_pos == len(self.exercises):
-            # start or end: delete the session
-            # UI
-            # ask message -> clicked
-            # delete()
-            # reject()
-            if self.wse.workout_exercises:
-                self.db.delete(self.wse.workout_exercises)
-            self.db.delete(self.wse)
-        else:
-            # delete the exercise
-            tex, wex = self.current_exercise
-            self.db.delete(wex)
-
-    def save_session(self, comment: str):
-        print('saving session (comment)')
-        # UI
-        # widgets2object
-        # save the comment
-        print(self.wse, comment)
-        self.wse.comment = comment
-        print(self.wse)
-        print('dirty', self.wse in self.db.session.dirty)
-        self.db.update()
-        print('dirty', self.wse in self.db.session.dirty)
-
-        # UI
-        # Update widgets after saving??
-        # score = self.assess_session()
-        # self.assess_session_set_text(score)
-
-    def update_wex(self, wex: 'WorkoutExerciseModel', repetitions: int, weight: Optional[float],
-                   duration: Optional[int], comment: Optional[str]):
-
-        wex.sequence = self.current_pos + 1,  # the position equals the sequence in the tpe
-        wex.set = self.current_set
-        wex.repetitions = repetitions
-        if self.baseline_weight:
-            if not weight:
-                raise ValueError('The Exercises requires a weight')
-            wex.weight = weight
-        if self.baseline_duration:
-            if not duration:
-                raise ValueError('The Exercises requires a duration')
-            wex.duration = duration
-        wex.comment = comment
-
-    def save_exercise(self, repetitions: int, weight: float, duration: int, comment: str):
-        # UI
-        # - updated object from widgets
-        # - save
-
-        tex, wex = self.current_exercise
-        print('saving exercise')
-
-        if wex:
-            print('  existing', wex)
-            self.update_wex(wex, repetitions, weight, duration, comment)
-            # The exercise already exists in the database
-            self.db.update()
+        if self.current_pos == -1 or self.current_pos == len(self.workout_session.exercises):
+            self.workout_session.remove_session()
 
         else:
-            # Create a new Object, add the relations
-            wex = WorkoutExerciseModel()
-            wex.training_exercise = tex
-            wex.workout_session = self.wse
-            self.update_wex(wex, repetitions, weight, duration, comment)
-            print(' ', wex)
-            self.db.create(wex)
+            self.current_exercise_set.remove_exercise(self.current_set)
 
-        # Add the tex to the wex
-        self.current_exercise = wex
-        print(self.current_exercise)
+    def delete_message(self) -> bool:
+        # Check, if there should be a delete message popped or not
+        if self.current_pos == -1 or self.current_pos == len(self.workout_session.exercises):
+            # Check, if there are any exercises saved
+            if self.workout_session.wex_saved:
+                # Session with saved workout exercises -> pop message
+                return True
+            else:
+                # no exercises saved, just delete the session
+                return False
+        else:
+            # Delete exercise -> no message
+            return False
 
-        # assess the score of the exercise
-        # score = self.assess_exercise(tex, wex)
-
-        # UI
-        # update widgets or only the score
-        # self.assess_exercise_set_text(score)
-
-    def previous_exercise(self) -> Union[str, Tuple['TrainingExerciseModel', 'WorkoutExerciseModel']]:
+    def previous_exercise(self):
         print('previous exercise or set')
         # minimum position: -1
-        go2start = False
 
-        if len(self.exercises) == self.current_pos:
+        if len(self.workout_session.exercises) == self.current_pos:
             # end position, go to last set of the last exercise, current_set was not changed
             self.current_pos -= 1
-            tex, wex = self.current_exercise
-            self.current_set = tex.baseline_sets
+            # tex, wex = self.current_exercise
+            self.current_set = self.current_exercise_set.tex_model.baseline_sets - 1
+            # If you can add more sets than in the baseline -> go to len(wex_model_list)-1
 
         elif 0 == self.current_pos:
             # first exercise
-            if self.current_set == 1:
+            if self.current_set == 0:
                 # go to start position
                 self.current_pos -= 1
-                go2start = True
             else:
                 # previous set of the first exercise
                 self.current_set -= 1
 
         elif self.current_pos > 0:
-            if self.current_set > 1:
+            if self.current_set > 0:
                 # previous set of the current exercise
                 print('previous set of the current exercise')
                 self.current_set -= 1
@@ -210,27 +145,23 @@ class Workout:
                 # last set of the previous exercise
                 print('last set of the previous exercise')
                 self.current_pos -= 1
-                tex, wex = self.current_exercise
-                self.current_set = tex.baseline_sets
-
-        if go2start:
-            return 'start'
+                self.current_set = self.current_exercise_set.tex_model.baseline_sets - 1
         else:
-            return self.current_exercise
+            # if it is on start position (-1), nothing happens
+            # if it is higher than len(self.workout_session.exercises) -> error?
+            pass
 
-    def next_exercise(self) -> Union[str, Tuple['TrainingExerciseModel', 'WorkoutExerciseModel']]:
+    def next_exercise(self):
         print('next exercise')
-        # maximum position: len(self.exercises)
-        go2end = False
+        # maximum position: len(self.workout_session.exercises)
 
-        if self.current_pos == len(self.exercises) - 1:
+        if self.current_pos == len(self.workout_session.exercises) - 1:
             # last exercise
-            tex, wex = self.current_exercise
-            if self.current_set == tex.baseline_sets:
-                # go to end position
+            if self.current_set == self.current_exercise_set.tex_model.baseline_sets - 1:
+                # last set -> go to end position
                 print('go to end position')
                 self.current_pos += 1
-                go2end = True
+                # self.current_set += 1 --> does not matter -> remove some if/else
             else:
                 # go to the next set of the exercise
                 print('go to the next set of the last exercise')
@@ -240,10 +171,9 @@ class Workout:
             # start position, go to first set of the first exercise
             print('start position, go to first set of the first exercise')
             self.current_pos += 1
-            self.current_set = 1
-        elif self.current_pos < len(self.exercises):
-            tex, wex = self.current_exercise
-            if self.current_set < tex.baseline_sets:
+            self.current_set = 0
+        elif self.current_pos < len(self.workout_session.exercises):
+            if self.current_set < self.current_exercise_set.tex_model.baseline_sets - 1:
                 # next set of the current exercise
                 print('next set of the current exercise')
                 self.current_set += 1
@@ -251,92 +181,26 @@ class Workout:
                 # first set of the next exercise
                 print('first set of the next exercise')
                 self.current_pos += 1
-                self.current_set = 1
-
-        if go2end:
-            return 'end'
+                self.current_set = 0
         else:
-            return self.current_exercise
+            # if it is on end position (len(exercises), nothing happens
+            # if it is higher than len(self.workout_session.exercises) -> error?
+            pass
 
     def calc_ratio(self, weight: float) -> float:
-        return weight / self.baseline_weight
+        return weight / self.current_exercise_set.baseline_weight
 
     def calc_weight(self, ratio: float) -> float:
-        return ratio * self.baseline_weight
+        return ratio * self.current_exercise_set.baseline_weight
 
     def assess(self) -> Optional[float]:
-        if self.current_pos == -1 or self.current_pos == len(self.exercises):
-            score = self.assess_session()
+        if self.current_pos == -1 or self.current_pos == len(self.workout_session.exercises):
+            # assess the session (all sets of all exercise)
+            # no exercises yet -> 0
+            score = self.workout_session.assess_session()
         else:
-            tex, wex = self.current_exercise
-            score = self.assess_exercise(tex, wex)
+            # asses the current set of the current exercise
+            # no wex yet -> False
+            score = self.current_exercise_set.assess_exercise(self.current_set)
 
         return score
-
-    def assess_exercise(self, tex: 'TrainingExerciseModel', wex: Optional['WorkoutExerciseModel']
-                        ) -> Optional[float]:
-
-        if wex:
-            score = wex.repetitions / tex.baseline_repetitions
-            if self.baseline_weight:  # tex.baseline_weight or usr.weight
-                score *= wex.weight / self.baseline_weight
-            if self.baseline_duration:
-                score *= wex.duration / self.baseline_duration
-            return score
-
-        return None  # if start / end or no wex yet
-
-    def assess_session(self) -> float:
-
-        score = 1
-        skipped = 0
-        print(self.exercises)
-        for tex, wexes in self.exercises:
-            tex_score = 1
-            wex_skipped = 0
-            for i, wex in enumerate(wexes):
-                if wex:
-                    if i < tex.baseline_sets:
-                        tex_score *= self.assess_exercise(tex, wex)
-                    else:  # additional sets increase with +
-                        tex_score += self.assess_exercise(tex, wex) / tex.baselin_sets
-
-                else:  # no workout saved for the set
-                    print('no workout saved for the set')
-                    # print(tex_score, tex_score / tex.baseline_sets)
-                    # tex_score -= tex_score / tex.baseline_sets
-                    wex_skipped += 1
-            tex_score -= tex_score * wex_skipped / len(wexes)
-            if tex_score == 0:
-                print('no exercise saved for tex', tex)
-                skipped += 1
-            else:
-                score *= tex_score
-
-        score -= score * skipped / len(self.exercises)
-
-        return score
-
-    def update_baseline(self):
-        if self.current_pos <= -1:
-            self.current_pos = -1
-            self.baseline_weight = None
-            self.baseline_duration = None
-        elif self.current_pos >= len(self.exercises):
-            self.current_pos = len(self.exercises)
-            self.baseline_weight = None
-            self.baseline_duration = None
-        else:
-            tex, wex = self.current_exercise
-
-            # set default values for weight / duration
-            if tex.baseline_weight:
-                self.baseline_weight = tex.baseline_weight
-            elif tex.tex_usr_id:
-                self.baseline_weight = self.usr.weight
-            else:
-                self.baseline_weight = None
-            if tex.baseline_duration:
-                self.baseline_duration = tex.baseline_duration
-            else:
-                self.baseline_duration = None

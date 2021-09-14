@@ -9,35 +9,33 @@ from PyQt5.QtWidgets import QDialog
 
 from .dialog_workout_ui import Ui_Dialog_workout
 from .messages import open_message_box
-from ..app import Workout
+from ..app.workout import Workout
 
 if TYPE_CHECKING:
     from ..db import CRUD
-    from ..models import TrainingProgramModel, TrainingExerciseModel, WorkoutSessionModel, WorkoutExerciseModel
+    from ..models import TrainingExerciseModel, WorkoutExerciseModel
 
 
 class WorkoutDialog(Workout, QDialog, Ui_Dialog_workout):
 
     def __init__(self,
                  # Workout
-                 db: 'CRUD', parent_tpr_id: int, obj: 'WorkoutSessionModel' = None,
+                 db: 'CRUD', tpr_id: int, wse_id: int = None,
                  # Qdialog
                  parent=None,
                  ):
         # With super, the arguments for the QDialog (second inheritance)
         # must be passed in the __init__ function of Workout (first inheritance)
-        super().__init__(db=db, parent_tpr_id=parent_tpr_id, obj=obj,
+        super().__init__(db=db, tpr_id=tpr_id, wse_id=wse_id,
                          parent=parent)
 
         # Workout is initialized, if a user is missing, open messagebox
-        if not self.usr:
-            message = self.messages['no_user']
-            open_message_box(message)
+        # -> move to main window -> cant start a workout without a user
 
         self.setupUi(self)
         self.connect()
 
-        self.update_dialog(start=True)
+        self.update_dialog()
 
     def connect(self):
         """
@@ -67,44 +65,33 @@ class WorkoutDialog(Workout, QDialog, Ui_Dialog_workout):
         self.assess_set_text(score)
 
     def delete_clicked(self):
-        if self.current_pos == -1 or self.current_pos == len(self.exercises):
-            # start or end, delete the session
+        # if self.current_pos == -1 or self.current_pos == len(self.exercises):
+        if self.delete_message:
+            # start or end, delete the session and all exercises
             message = self.messages['delete_session']
             clicked = open_message_box(message)
             if clicked:
                 self.delete()
                 self.reject()
 
-            # self.db.delete(self.wse)
         else:
-            # Delete an exercise
+            # Delete an exercise or an empty session
             self.delete()
 
     def previous_exercise_clicked(self):
         print('previous exercise')
         # minimum position: -1
 
-        previous_ex = self.previous_exercise()
-        print(previous_ex)
-
-        if previous_ex == 'start':
-            self.update_dialog(start=True)
-        else:
-            tex, wex = previous_ex
-            self.update_dialog(tex=tex, wex=wex)
+        self.previous_exercise()
+        self.update_dialog()
 
     def next_exercise_clicked(self):
         print('next exercise')
         # maximum position: len(self.exercises)
 
-        next_ex = self.next_exercise()
-        print(next_ex)
+        self.next_exercise()
 
-        if next_ex == 'end':
-            self.update_dialog(end=True)
-        else:
-            tex, wex = next_ex
-            self.update_dialog(tex=tex, wex=wex)
+        self.update_dialog()
 
     def weight_changed(self):
         # weight was changed --> update the ratio
@@ -116,20 +103,22 @@ class WorkoutDialog(Workout, QDialog, Ui_Dialog_workout):
         weight = self.calc_weight(self.doubleSpinBox_ratio.value())
         self.doubleSpinBox_weight.setValue(weight)
 
-    def update_dialog(self, start=False, end=False, tex=None, wex=None):
+    def update_dialog(self):
 
-        self.update_baseline()
+        # self.update_baseline()
         print('update dialog')
-        self.update_labels(start, end, tex)
+        start = self.start_position
+        end = self.end_position
 
-        if tex:
-            self.set_values(tex, wex)
+        self.update_labels()
+
+        if not start and not end:
+            self.set_values()
 
         score = self.assess()
         self.assess_set_text(score)
 
-    def update_labels(self, start: bool = False, end: bool = False,
-                      tex: 'TrainingExerciseModel' = None):
+    def update_labels(self):
         print('update labels')
         # set labels and activate/deactivate widgets
 
@@ -146,10 +135,11 @@ class WorkoutDialog(Workout, QDialog, Ui_Dialog_workout):
         self.pushButton_save.setEnabled(True)
         self.pushButton_delete.setEnabled(True)
 
+        tpr = self.workout_session.tpr_model
         self.label_program.setText(
-            f'{self.parent_tpr.training_theme.name}: {self.parent_tpr.name}'
+            f'{tpr.training_theme.name}: {tpr.name}'
         )
-        if start:
+        if self.start_position:
             print('  setting start')
             self.label_exercise.setText('Start')
             self.label_sets.setText('')
@@ -161,17 +151,13 @@ class WorkoutDialog(Workout, QDialog, Ui_Dialog_workout):
             self.pushButton_previous_exercise.setEnabled(False)
             self.pushButton_start.setEnabled(False)
             # update widgets
-            self.textEdit_comment.setText(self.wse.comment)
+            self.textEdit_comment.setText(self.workout_session.model.comment)
 
-        elif end:
-            self.current_pos = len(self.exercises)
-            self.baseline_weight = None
-            self.baseline_duration = None
+        elif self.end_position:
 
             print('  setting end')
             self.label_exercise.setText('Ende')
             self.label_sets.setText('')
-            self.current_pos = len(self.exercises)
             # enable / disable buttons / input
             self.spinBox_repetitions.setEnabled(False)
             self.doubleSpinBox_weight.setEnabled(False)
@@ -180,55 +166,64 @@ class WorkoutDialog(Workout, QDialog, Ui_Dialog_workout):
             self.pushButton_next_exercise.setEnabled(False)
             self.pushButton_end.setEnabled(False)
             # update widgets
-            self.textEdit_comment.setText(self.wse.comment)
+            self.textEdit_comment.setText(self.workout_session.model.comment)
 
-        elif tex:
+        else:
+            # Exercise
             print('  setting exercise')
+            tex, wex = self.current_tex_wex
             # Add the information from the current tex and wex
             self.label_exercise.setText(tex.name)
-            self.label_sets.setText(f'Set {self.current_set} / {tex.baseline_sets}')
+            self.label_sets.setText(f'Set {self.current_set + 1} / {tex.baseline_sets}')
 
-            if not self.baseline_weight:
+            if not self.current_exercise_set.baseline_weight:
                 self.doubleSpinBox_weight.setEnabled(False)
                 self.doubleSpinBox_ratio.setEnabled(False)
-            if not self.baseline_duration:
+            if not tex.baseline_duration:
                 self.doubleSpinBox_duration.setEnabled(False)
 
-    def set_values(self, tex: 'TrainingExerciseModel', wex: 'WorkoutExerciseModel'):
+    def set_values(self):
         print('set values')
+        tex, wex = self.current_tex_wex
 
         if wex:  # load the existing workout exercise
             # Set the values based on the existing workout exercise
-            print(wex.repetitions, wex.weight, wex.comment)
-            self.spinBox_repetitions.setValue(wex.repetitions)
-            if wex.weight:
-                self.doubleSpinBox_weight.setValue(wex.weight)
-                self.doubleSpinBox_ratio.setValue(wex.weight / self.baseline_weight)
-            else:  # should not happen
-                self.doubleSpinBox_weight.clear()
-                self.doubleSpinBox_ratio.clear()
-            if wex.duration:
-                self.doubleSpinBox_duration.setValue(wex.duration)
-            else:  # should not happpen
-                self.doubleSpinBox_duration.clear()
-
-            self.textEdit_comment.setText(wex.comment)
+            self.set_wex_values(wex, self.current_exercise_set.baseline_weight)
 
         else:  # set the default values of the training exercise
-            print(tex.baseline_repetitions, tex.baseline_weight, tex.baseline_duration)
-            print(self.baseline_weight, self.baseline_duration)
-            self.spinBox_repetitions.setValue(tex.baseline_repetitions)
-            if self.baseline_weight:  # tex.baseline_weight or usr.weight
-                self.doubleSpinBox_weight.setValue(self.baseline_weight)
-                self.doubleSpinBox_ratio.setValue(1)
-            else:
-                self.doubleSpinBox_weight.clear()
-                self.doubleSpinBox_ratio.clear()
-            if self.baseline_duration:  # tex.baseline_duration
-                self.doubleSpinBox_duration.setValue(self.baseline_duration)
-            else:
-                self.doubleSpinBox_duration.clear()
-            self.textEdit_comment.clear()  # no comment yet
+            self.set_default_values(tex, self.current_exercise_set.baseline_weight)
+
+    def set_wex_values(self, wex: 'WorkoutExerciseModel', baseline_weight: float):
+        print(wex.repetitions, wex.weight, wex.comment)
+        self.spinBox_repetitions.setValue(wex.repetitions)
+        if wex.weight:
+            self.doubleSpinBox_weight.setValue(wex.weight)
+            self.doubleSpinBox_ratio.setValue(wex.weight / baseline_weight)
+        else:  # should not happen
+            self.doubleSpinBox_weight.clear()
+            self.doubleSpinBox_ratio.clear()
+        if wex.duration:
+            self.doubleSpinBox_duration.setValue(wex.duration)
+        else:  # should not happpen
+            self.doubleSpinBox_duration.clear()
+
+        self.textEdit_comment.setText(wex.comment)
+
+    def set_default_values(self, tex: 'TrainingExerciseModel', baseline_weight: float):
+        print(tex.baseline_repetitions, tex.baseline_weight, tex.baseline_duration)
+        print(baseline_weight, tex.baseline_duration)
+        self.spinBox_repetitions.setValue(tex.baseline_repetitions)
+        if baseline_weight:  # tex.baseline_weight or usr.weight
+            self.doubleSpinBox_weight.setValue(baseline_weight)
+            self.doubleSpinBox_ratio.setValue(1)
+        else:
+            self.doubleSpinBox_weight.clear()
+            self.doubleSpinBox_ratio.clear()
+        if tex.baseline_duration:  # tex.baseline_duration
+            self.doubleSpinBox_duration.setValue(tex.baseline_duration)
+        else:
+            self.doubleSpinBox_duration.clear()
+        self.textEdit_comment.clear()  # no comment yet
 
     def assess_set_text(self, score: Optional[float]):
         if score == float(0):

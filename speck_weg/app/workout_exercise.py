@@ -77,13 +77,13 @@ class WorkoutExerciseSet:
         self.wse_model: 'WorkoutSessionModel' = self.db.read_one(stmt)
         # TrainingExercise
         stmt = select(TrainingExerciseModel).where(
-            TrainingExerciseModel.tex_id == tex_id).option(
+            TrainingExerciseModel.tex_id == tex_id).options(
             joinedload(TrainingExerciseModel.user)
         )
         self.tex_model: 'TrainingExerciseModel' = self.db.read_one(stmt)
 
         self.wex_model_list: List[Optional['WorkoutExerciseModel']] = [
-            None for _ in range(len(self.tex_model.baseline_sets))
+            None for _ in range(self.tex_model.baseline_sets)
         ]
         # Todo: select the models and replace None (if they exist -> for editing)
 
