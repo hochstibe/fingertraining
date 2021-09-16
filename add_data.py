@@ -4,7 +4,8 @@
 #
 
 from speck_weg.models import (TrainingThemeModel, TrainingProgramModel, TrainingExerciseModel,
-                              TrainingProgramExerciseModel, UserModel)
+                              TrainingProgramExerciseModel, UserModel,
+                              WorkoutSessionModel, WorkoutExerciseModel)
 
 from speck_weg.db import CRUD
 
@@ -69,6 +70,25 @@ if __name__ == '__main__':
     tpe24 = TrainingProgramExerciseModel(training_program=tpr4, training_exercise=tex15, sequence=6)
     tpe25 = TrainingProgramExerciseModel(training_program=tpr4, training_exercise=tex16, sequence=7)
 
+    tth101 = TrainingThemeModel(name='Test', sequence=2)
+    tpr101 = TrainingProgramModel(name='Test', training_theme=tth101, sequence=1)
+    tex101 = TrainingExerciseModel(name='weight', baseline_sets=2, baseline_repetitions=3, baseline_weight=3.)
+    tex102 = TrainingExerciseModel(name='body_weight duration', baseline_sets=3, baseline_repetitions=3, user=usr1, baseline_duration=11)
+    tex103 = TrainingExerciseModel(name='repetitions', baseline_sets=3, baseline_repetitions=2)
+    tpe101 = TrainingProgramExerciseModel(training_program=tpr101, training_exercise=tex101, sequence=1)
+    tpe102 = TrainingProgramExerciseModel(training_program=tpr101, training_exercise=tex102, sequence=2)
+    tpe103 = TrainingProgramExerciseModel(training_program=tpr101, training_exercise=tex103, sequence=3)
+
+    # workout
+    wse1 = WorkoutSessionModel(training_program=tpr101)
+    wex1 = WorkoutExerciseModel(workout_session=wse1, training_exercise=tex101, sequence=1, set=1, weight=1.5, repetitions=3)
+    wex2 = WorkoutExerciseModel(workout_session=wse1, training_exercise=tex101, sequence=1, set=2, weight=3, repetitions=6)
+    wex3 = WorkoutExerciseModel(workout_session=wse1, training_exercise=tex102, sequence=2, set=1, weight=72, duration=22, repetitions=3)
+    wex4 = WorkoutExerciseModel(workout_session=wse1, training_exercise=tex102, sequence=2, set=2, weight=36, duration=11, repetitions=3)
+    wex5 = WorkoutExerciseModel(workout_session=wse1, training_exercise=tex102, sequence=2, set=3, weight=36, duration=22, repetitions=3)
+    wex6 = WorkoutExerciseModel(workout_session=wse1, training_exercise=tex103, sequence=3, set=1, repetitions=2)
+    wex7 = WorkoutExerciseModel(workout_session=wse1, training_exercise=tex103, sequence=3, set=1, repetitions=4)
+
     objects = [
         usr1,
         tth1,
@@ -115,5 +135,21 @@ if __name__ == '__main__':
         tpe22,
         tpe23,
         tpe24,
+        tth101,
+        tpr101,
+        tex101,
+        tex102,
+        tex103,
+        tpe101,
+        tpe102,
+        tpe103,
+        wse1,
+        wex1,
+        wex2,
+        wex3,
+        wex4,
+        wex5,
+        wex6,
+        wex7,
     ]
     db.create(objects)

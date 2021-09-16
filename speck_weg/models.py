@@ -5,9 +5,11 @@
 
 from sqlalchemy import (MetaData, Column,
                         Integer, String, DateTime, Float,
-                        ForeignKey, UniqueConstraint)
+                        ForeignKey, UniqueConstraint,
+                        select, case, cast)
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.sql import func
+from sqlalchemy_utils import create_view
 
 
 metadata = MetaData(
@@ -173,3 +175,75 @@ class UserModel(Base):
 
     def __repr__(self):
         return f'UserModel(usr_id={self.usr_id}, name={self.name} weight={self.weight}'
+
+
+class TrainingExerciseView:
+    # __view__ instead of __table
+
+    __table__ = create_view(
+        name='training_exercise_view',
+        selectable=select(
+            TrainingExerciseModel.tex_id.label('tex_id'),
+            TrainingExerciseModel.name.label('name'),
+            TrainingExerciseModel.description.label('description'),
+            TrainingExerciseModel.baseline_sets.label('baseline_sets'),
+            TrainingExerciseModel.baseline_repetitions.label('baseline_repetitions'),
+            TrainingExerciseModel.baseline_duration.label('baseline_duration'),
+            case(
+                # is not None -> error
+                (TrainingExerciseModel.baseline_weight != None, TrainingExerciseModel.baseline_weight),  # noqa
+                (TrainingExerciseModel.tex_usr_id != None, UserModel.weight),  # noqa
+                else_=None
+            ).label('baseline_weight')
+        ).outerjoin(TrainingExerciseModel.user),
+        metadata=Base.metadata,
+    )
+
+    def __repr__(self):
+        return f'TrainingExerciseView(tex_id={self.tex_id}, baseline_sets={self.baseline_sets}, baseline_weight={self.baseline_weight})'  # noqa
+
+
+class WorkoutExerciseView(Base):
+    _subq1 = select(
+        WorkoutExerciseModel.wex_id, WorkoutExerciseModel.wex_wse_id,
+        WorkoutExerciseModel.wex_tex_id, WorkoutExerciseModel.sequence, WorkoutExerciseModel.set,
+        WorkoutExerciseModel.weight, WorkoutExerciseModel.duration,
+        WorkoutExerciseModel.repetitions, WorkoutExerciseModel.comment,
+        TrainingExerciseModel.name, TrainingExerciseModel.baseline_duration,
+        TrainingExerciseModel.baseline_repetitions,
+        case(
+            (TrainingExerciseModel.baseline_weight != None, TrainingExerciseModel.baseline_weight),  # noqa
+            (TrainingExerciseModel.tex_usr_id != None, UserModel.weight),  # noqa
+            else_=None
+        ).label('baseline_weight')
+    ).select_from(WorkoutExerciseModel).outerjoin(
+        WorkoutExerciseModel.training_exercise).outerjoin(
+        TrainingExerciseModel.user
+    ).subquery()
+    _subq2 = select(
+        _subq1.c.wex_id, _subq1.c.wex_wse_id, _subq1.c.wex_tex_id, _subq1.c.sequence, _subq1.c.set,
+        _subq1.c.weight, _subq1.c.duration, _subq1.c.repetitions,
+        _subq1.c.name,
+        (cast(_subq1.c.repetitions, Float) / cast(_subq1.c.baseline_repetitions, Float)).label(
+            'score_repetitions'),
+        case(
+            (_subq1.c.baseline_weight != None, _subq1.c.weight / _subq1.c.baseline_weight),  # noqa
+            else_=1.0
+        ).label('score_weight'),
+        case(
+            (_subq1.c.baseline_duration != None, _subq1.c.duration / _subq1.c.baseline_duration),  # noqa
+            else_=1.0
+        ).label('score_duration')
+    ).subquery()
+    __table__ = create_view(
+        name='workout_exercise_view',
+        selectable=select(
+            _subq2.c.wex_id, _subq2.c.wex_wse_id, _subq2.c.wex_tex_id,
+            _subq2.c.sequence, _subq2.c.set,
+            _subq2.c.weight, _subq2.c.duration, _subq2.c.repetitions,  # all other attributes
+            _subq2.c.name,
+            (_subq2.c.score_repetitions * _subq2.c.score_weight * _subq2.c.score_duration).label(
+                'score'),
+        ).order_by(_subq2.c.wex_wse_id, _subq2.c.sequence, _subq2.c.set),
+        metadata=Base.metadata
+    )

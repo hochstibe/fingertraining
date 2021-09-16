@@ -5,9 +5,9 @@
 
 from typing import List, Any, Type, Union, TYPE_CHECKING
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+import sqlalchemy.exc
 
 from .models import metadata
 
@@ -25,7 +25,12 @@ def start_session(drop_all=False):
     if drop_all:
         metadata.drop_all(engine)
 
-    metadata.create_all(engine)
+    try:
+        metadata.create_all(engine, checkfirst=True)
+    except(sqlalchemy.exc.OperationalError, sqlalchemy.exc.ProgrammingError):
+        # if the view already exist -> only check tables
+        for table in metadata.tables:
+            metadata.tables[table].create(bind=engine, checkfirst=True)
 
     # Start the session
     # Todo: sessionmaker -> new session for new transactions or new session for new window
