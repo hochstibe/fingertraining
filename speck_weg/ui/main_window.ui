@@ -14,7 +14,7 @@
    <string>Speck Weg!</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout_6">
+   <layout class="QHBoxLayout" name="horizontalLayout_7">
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_6">
       <item>
@@ -267,15 +267,48 @@
        </widget>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>Workout</string>
-            </property>
-           </widget>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <widget class="QLabel" name="label_4">
+              <property name="font">
+               <font>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Workout</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_edit_workout">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="resources/resources.qrc">
+                <normaloff>:/icons/pencil-alt-solid.svg</normaloff>:/icons/pencil-alt-solid.svg</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_5">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
           </item>
           <item>
            <widget class="QListWidget" name="listWidget_workouts">
@@ -299,6 +332,11 @@
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <item>
            <widget class="QLabel" name="label_5">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
             <property name="text">
              <string>Details</string>
             </property>

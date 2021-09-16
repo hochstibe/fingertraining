@@ -5,22 +5,23 @@
 
 from typing import Optional, Union, Dict, Tuple, TYPE_CHECKING
 
-from .app import Message
-from ..db import CRUD
+from . import Message
 from .workout_session import WorkoutSession
+from ..db import CRUD
 
 if TYPE_CHECKING:
     from .workout_exercise import WorkoutExerciseSet
-    from ..models import TrainingExerciseModel, WorkoutExerciseModel
+    from ..models import (TrainingExerciseModel, WorkoutExerciseModel,
+                          TrainingProgramModel, WorkoutSessionModel)
 
 
 class Workout:
-    def __init__(self, db: 'CRUD', tpr_id: int,
-                 wse_id: int = None, **kwargs):
+    def __init__(self, db: 'CRUD', tpr: Union[int, 'TrainingProgramModel'] = None,
+                 wse: Union[int, 'WorkoutSessionModel'] = None, **kwargs):
         # Additional arguments are passed to next inheritance
         super().__init__(**kwargs)
 
-        self.workout_session = WorkoutSession(db, tpr_id, wse_id)
+        self.workout_session = WorkoutSession(db, tpr, wse)
 
         # default messages
         self.messages: Dict[str, 'Message'] = dict()

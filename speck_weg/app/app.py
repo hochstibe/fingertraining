@@ -5,44 +5,12 @@
 
 from typing import List, Dict, Optional, TYPE_CHECKING
 
-from . import TrainingThemeCollection, TrainingProgramCollection, \
-    TrainingProgramExerciseCollection, User
+from . import (TrainingThemeCollection, TrainingProgramCollection,
+               TrainingProgramExerciseCollection, User, Message,
+               WorkoutSessionCollection)
 
 if TYPE_CHECKING:
     from ..db import CRUD
-
-
-class Message:
-    def __init__(self, title: str, text: str, level: str, informative_text: str = None,
-                 button_accept_name: str = None, button_reject_name: str = None):
-        # required
-        self.title = title
-        self.text = text
-        self._level = level  # protected
-        # optional
-        self.informative_text = informative_text
-        self.button_accept_name = button_accept_name
-        self.button_reject_name = button_reject_name
-
-        self.level = self._level
-
-        # if the message is accepted (only possible with an accept button)
-        self.accept: bool = False
-
-    @property
-    def level(self):
-        return self._level
-
-    @level.setter
-    def level(self, value):
-
-        if value not in ['information', 'question', 'warning', 'critical']:
-            raise NotImplementedError(
-                "Level must be one of 'information', 'question', 'warning' or 'critical'.")
-        self._level = value
-
-    def __repr__(self):
-        return f'Message(title={self.title}, text={self.text}, level={self.level})'
 
 
 class SpeckWeg:
@@ -63,6 +31,8 @@ class SpeckWeg:
         self.current_tpr_id: Optional[int] = None
         self.exercises = TrainingProgramExerciseCollection(self.db)
         self.current_tpe_id: Optional[int] = None  # training_program_exercise is unique
+        self.workouts = WorkoutSessionCollection(self.db)
+        self.current_wse_id: Optional[int] = None
 
         # default messages
         self.messages: Dict[str, 'Message'] = dict()
@@ -255,3 +225,32 @@ class SpeckWeg:
         else:
             # was the last in the list -> set the current last one
             self.current_tpe_id = self.exercises.model_list[-1].tpe_id
+
+    def workout_list_refresh(self, new: bool = False):
+        # read from db, store in list
+        # self.themes = self.themes_api.read_themes()
+
+        # if self.current_tpr_id:
+        # refresh the programs -> all sessions if no program selected
+        n_workouts_old = len(self.workouts.workout_list)
+
+        self.workouts.read_sessions(self.current_tpr_id, self.current_tth_id)
+        n_workouts_new = len(self.workouts.workout_list)
+        wse_ids = [workout.model.wse_id for workout in self.workouts.workout_list]
+
+        if n_workouts_new > n_workouts_old and new:
+            # a program was added -> active is the newest / last one
+            self.current_wse_id = self.workouts.workout_list[-1].model.wse_id
+        elif self.current_wse_id:
+            # one was previously selected
+            if self.current_wse_id in wse_ids:
+                # the id is still in the themes list
+                pass
+            else:
+                # does not exist anymore
+                print('current_tpr_id does not exist anymore')
+                self.current_wse_id = None
+        else:
+            # no new one, none was selected
+            print('current_tpr_id no new one, none was selected')
+            pass

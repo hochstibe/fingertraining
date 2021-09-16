@@ -60,6 +60,9 @@ class MainWindow(SpeckWeg, QMainWindow, Ui_MainWindow_training):
         self.pushButton_remove_exercise.clicked.connect(self.exercise_delete_clicked)
         self.pushButton_edit_exercise.clicked.connect(self.exercise_edit_clicked)
 
+        # Workouts
+        self.pushButton_edit_workout.clicked.connect(self.workout_edit_clicked)
+
         # Actions: User, Workout
         self.action_user_info.triggered.connect(self.edit_user_clicked)
         self.action_start_workout.triggered.connect(self.start_workout_clicked)
@@ -112,6 +115,7 @@ class MainWindow(SpeckWeg, QMainWindow, Ui_MainWindow_training):
 
         # refreshes the program list (based on the current_tth_id)
         self.program_list_widget_refresh()
+        # self.workout_list_widget_refresh() --> done in program_list_widget_refresh
 
     def theme_moved(self):
         print('theme moved')
@@ -228,6 +232,7 @@ class MainWindow(SpeckWeg, QMainWindow, Ui_MainWindow_training):
         print('programs updated')
 
         self.exercise_list_widget_refresh()
+        self.workout_list_widget_refresh()
 
     def program_moved(self):
         print('rows moved')
@@ -252,8 +257,9 @@ class MainWindow(SpeckWeg, QMainWindow, Ui_MainWindow_training):
         # update the selection
         self.selection2attr()
 
-        # refresh the exercises
+        # refresh the exercises and workouts
         self.exercise_list_widget_refresh()
+        self.workout_list_widget_refresh()
 
     def program_new_clicked(self):
         theme = self.listWidget_theme.currentItem()
@@ -433,8 +439,15 @@ class MainWindow(SpeckWeg, QMainWindow, Ui_MainWindow_training):
 
             if self.user:
                 # Start the workout dialog
-                dialog = WorkoutDialog(db=self.db, parent=self, tpr_id=program.data(user_role))
+                dialog = WorkoutDialog(db=self.db, parent=self, tpr=program.data(user_role))
                 dialog.exec()
+                if dialog.rejected:
+                    if dialog.workout_session.model and not dialog.workout_session.wex_saved:
+                        # Automatically delete the session without any exercises
+                        print('delete empty workout')
+                        dialog.delete()
+                    self.workout_list_widget_refresh(new=True)
+
             else:
                 # not possible without a user
                 message = self.messages['no_user']
@@ -445,3 +458,43 @@ class MainWindow(SpeckWeg, QMainWindow, Ui_MainWindow_training):
 
     def about_clicked(self):
         open_message_box(self.messages['about'])
+
+    def workout_list_widget_refresh(self, new: bool = False):
+        print('refreshing workouts')
+        self.listWidget_workouts.clear()
+        self.listWidget_workout_details.clear()
+
+        self.workout_list_refresh(new)
+
+        current_row = None
+        for i, workout in enumerate(self.workouts.workout_list):
+            wse = workout.model
+            dt = wse.date.strftime('%d.%m.%Y - %H:%M')
+            score = workout.assess_session()
+            text = f'{dt} - {wse.training_program.name}: {score*100:.1f}%'
+
+            self.listWidget_workouts.insertItem(i, text)
+            self.listWidget_workouts.item(i).setData(user_role, wse.wse_id)
+            if wse.wse_id == self.current_wse_id:
+                current_row = i
+        if isinstance(current_row, int):
+            self.listWidget_workouts.setCurrentRow(current_row)
+
+    def workout_edit_clicked(self):
+        workout = self.listWidget_workouts.currentItem()
+
+        if workout:
+
+            if self.user:
+                # Start the workout dialog
+                dialog = WorkoutDialog(db=self.db, parent=self, wse=workout.data(user_role))
+                dialog.exec()
+                if dialog.rejected:
+                    self.workout_list_widget_refresh()
+            else:
+                # not possible without a user
+                message = self.messages['no_user']
+                open_message_box(message)
+
+        else:
+            open_message_box(self.messages['no_program_selected'])
