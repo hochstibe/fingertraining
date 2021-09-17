@@ -160,7 +160,7 @@ class TrainingExercise:
         self.model.description = description
         self.model.baseline_sets = baseline_sets
         self.model.baseline_repetitions = baseline_repetitions
-        self.model.baseline_weight = baseline_weight
+        self.model.baseline_custom_weight = baseline_weight
         self.model.baseline_duration = baseline_duration
 
 

@@ -88,8 +88,8 @@ class WorkoutExerciseSet:
         # Todo: select the models and replace None (if they exist -> for editing)
 
         # Set the baseline values for weight / duration
-        if self.tex_model.baseline_weight:
-            self.baseline_weight = self.tex_model.baseline_weight
+        if self.tex_model.baseline_custom_weight:
+            self.baseline_weight = self.tex_model.baseline_custom_weight
         elif self.tex_model.user:
             self.baseline_weight = self.tex_model.user.weight
         else:

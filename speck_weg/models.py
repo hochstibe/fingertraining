@@ -83,7 +83,7 @@ class TrainingExerciseModel(Base):
     description = Column(String(1023), nullable=True)
     baseline_sets = Column(Integer, nullable=False)
     baseline_repetitions = Column(Integer, nullable=False)
-    baseline_weight = Column(Float, nullable=True)
+    baseline_custom_weight = Column(Float, nullable=True)
     baseline_duration = Column(Float, nullable=True)
     # Todo: Duration in seconds --> Int probably better than float
 
@@ -191,7 +191,7 @@ class TrainingExerciseView:
             TrainingExerciseModel.baseline_duration.label('baseline_duration'),
             case(
                 # is not None -> error
-                (TrainingExerciseModel.baseline_weight != None, TrainingExerciseModel.baseline_weight),  # noqa
+                (TrainingExerciseModel.baseline_custom_weight != None, TrainingExerciseModel.baseline_custom_weight),  # noqa
                 (TrainingExerciseModel.tex_usr_id != None, UserModel.weight),  # noqa
                 else_=None
             ).label('baseline_weight')
@@ -212,7 +212,7 @@ class WorkoutExerciseView(Base):
         TrainingExerciseModel.name, TrainingExerciseModel.baseline_duration,
         TrainingExerciseModel.baseline_repetitions,
         case(
-            (TrainingExerciseModel.baseline_weight != None, TrainingExerciseModel.baseline_weight),  # noqa
+            (TrainingExerciseModel.baseline_custom_weight != None, TrainingExerciseModel.baseline_custom_weight),  # noqa
             (TrainingExerciseModel.tex_usr_id != None, UserModel.weight),  # noqa
             else_=None
         ).label('baseline_weight')

@@ -62,9 +62,9 @@ class ExerciseLoadDialog(TrainingExerciseCollection, QDialog, Ui_Dialog_training
 
         self.checkBox_weight.setChecked(False)
         self.checkBox_body_weight.setChecked(False)
-        if self.current_model.baseline_weight:
+        if self.current_model.baseline_custom_weight:
             self.checkBox_weight.setChecked(True)
-            self.doubleSpinBox_weight.setValue(self.current_model.baseline_weight)
+            self.doubleSpinBox_weight.setValue(self.current_model.baseline_custom_weight)
         if self.current_model.tex_usr_id:
             self.checkBox_weight.setChecked(True)
             self.checkBox_body_weight.setChecked(True)

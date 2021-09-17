@@ -210,7 +210,7 @@ class WorkoutDialog(Workout, QDialog, Ui_Dialog_workout):
         self.textEdit_comment.setText(wex.comment)
 
     def set_default_values(self, tex: 'TrainingExerciseModel', baseline_weight: float):
-        print(tex.baseline_repetitions, tex.baseline_weight, tex.baseline_duration)
+        print(tex.baseline_repetitions, tex.baseline_custom_weight, tex.baseline_duration)
         print(baseline_weight, tex.baseline_duration)
         self.spinBox_repetitions.setValue(tex.baseline_repetitions)
         if baseline_weight:  # tex.baseline_weight or usr.weight

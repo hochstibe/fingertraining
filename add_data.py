@@ -72,7 +72,7 @@ if __name__ == '__main__':
 
     tth101 = TrainingThemeModel(name='Test', sequence=2)
     tpr101 = TrainingProgramModel(name='Test', training_theme=tth101, sequence=1)
-    tex101 = TrainingExerciseModel(name='weight', baseline_sets=2, baseline_repetitions=3, baseline_weight=3.)
+    tex101 = TrainingExerciseModel(name='weight', baseline_sets=2, baseline_repetitions=3, baseline_custom_weight=3.)
     tex102 = TrainingExerciseModel(name='body_weight duration', baseline_sets=3, baseline_repetitions=3, user=usr1, baseline_duration=11)
     tex103 = TrainingExerciseModel(name='repetitions', baseline_sets=3, baseline_repetitions=2)
     tpe101 = TrainingProgramExerciseModel(training_program=tpr101, training_exercise=tex101, sequence=1)

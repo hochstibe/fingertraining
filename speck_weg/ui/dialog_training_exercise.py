@@ -146,10 +146,10 @@ class ExerciseDialog(TrainingExercise, QDialog, Ui_Dialog_training_exercise):
             self.spinBox_sets.setValue(self.model.baseline_sets)
             self.spinBox_repetitions.setValue(self.model.baseline_repetitions)
 
-            if self.model.baseline_weight:
+            if self.model.baseline_custom_weight:
                 self.checkBox_weight.setChecked(True)
                 self.checkBox_body_weight.setChecked(False)
-                self.doubleSpinBox_weight.setValue(self.model.baseline_weight)
+                self.doubleSpinBox_weight.setValue(self.model.baseline_custom_weight)
             elif self.model.tex_usr_id:
                 self.checkBox_weight.setChecked(False)
                 self.checkBox_body_weight.setChecked(True)
